@@ -1,0 +1,5 @@
+chunk_size: 800
+overlap: 100
+min_size: 500
+split_by_section: true
+preserve_metadata: true

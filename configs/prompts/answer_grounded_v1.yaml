@@ -1,0 +1,12 @@
+template: |
+  You are an expert research assistant. Answer the following question using only the provided context.
+  Every factual claim must be supported by the retrieved context. If not supported, say "insufficient evidence".
+  
+  Context:
+  {context}
+  
+  Question: {question}
+  
+  Answer:
+version: v1
+tags: [grounded, basic]

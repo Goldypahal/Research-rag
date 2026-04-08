@@ -1,0 +1,11 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.13.5, pytest-9.0.2, pluggy-1.6.0 -- C:\Users\Asus\AppData\Local\Programs\Python\Python313\python.exe
+cachedir: .pytest_cache
+rootdir: G:\Desktop\RAG\research_rag
+plugins: anyio-4.10.0, langsmith-0.6.0
+collecting ... collected 2 items
+
+tests/unit/test_evaluation.py::test_synthetic_qa_generation PASSED       [ 50%]
+tests/unit/test_evaluation.py::test_save_dataset_jsonl PASSED            [100%]
+
+============================== 2 passed in 1.80s ==============================

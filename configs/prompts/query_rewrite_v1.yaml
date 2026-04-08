@@ -1,0 +1,5 @@
+template: |
+  Rewrite the following query to improve retrieval for a research paper RAG system.
+  Original Query: {query}
+  Rewritten Query:
+version: v1

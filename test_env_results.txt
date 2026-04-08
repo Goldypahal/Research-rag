@@ -1,0 +1,94 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.13.5, pytest-9.0.2, pluggy-1.6.0 -- C:\Users\Asus\AppData\Local\Programs\Python\Python313\python.exe
+cachedir: .pytest_cache
+rootdir: G:\Desktop\RAG\research_rag
+plugins: anyio-4.10.0, langsmith-0.6.0
+collecting ... collected 3 items
+
+tests/env/test_env.py::test_env_variables FAILED                         [ 33%]
+tests/env/test_env.py::test_dependencies FAILED                          [ 66%]
+tests/env/test_env.py::test_data_directories FAILED                      [100%]
+
+================================== FAILURES ===================================
+_____________________________ test_env_variables ______________________________
+
+    def test_env_variables():
+        """Check if critical environment variables are set."""
+        # We check settings instead of raw os.environ because pydantic handles defaults/overrides
+        assert settings.CHROMA_DB_PATH is not None
+    
+        # Critical API keys (assuming they are required for full functionality)
+        # If the user hasn't set them, we might want a warning or skip,
+        # but for a 'test_env' we usually want to know if they are missing.
+        missing_keys = []
+        if not settings.OPENAI_API_KEY:
+            missing_keys.append("OPENAI_API_KEY")
+        if not settings.COHERE_API_KEY:
+            missing_keys.append("COHERE_API_KEY")
+    
+        if missing_keys:
+>           pytest.fail(f"Missing critical API keys: {', '.join(missing_keys)}")
+E           Failed: Missing critical API keys: OPENAI_API_KEY, COHERE_API_KEY
+
+tests\env\test_env.py:21: Failed
+______________________________ test_dependencies ______________________________
+
+    def test_dependencies():
+        """Verify that all core dependencies are importable."""
+        deps = [
+            "fastapi",
+            "pydantic",
+            "langchain",
+            "chromadb",
+            "fitz",  # PyMuPDF
+            "unstructured",
+            "tenacity",
+            "docx",   # python-docx
+            "boto3",
+            "sentence_transformers",
+            "rank_bm25"
+        ]
+    
+        missing_deps = []
+        for dep in deps:
+            try:
+                importlib.import_module(dep)
+            except ImportError:
+                missing_deps.append(dep)
+    
+        if missing_deps:
+>           pytest.fail(f"Missing or broken dependencies: {', '.join(missing_deps)}")
+E           Failed: Missing or broken dependencies: chromadb
+
+tests\env\test_env.py:47: Failed
+____________________________ test_data_directories ____________________________
+
+    def test_data_directories():
+        """Check if required data directories exist."""
+        dirs = [
+            "data/raw_papers",
+            "data/figures",
+            "data/feedback",
+            "data/traces",
+            "configs/prompts"
+        ]
+        for d in dirs:
+>           assert os.path.exists(d), f"Directory {d} does not exist"
+E           AssertionError: Directory data/figures does not exist
+E           assert False
+E            +  where False = <built-in function _path_exists>('data/figures')
+E            +    where <built-in function _path_exists> = <module 'ntpath' (frozen)>.exists
+E            +      where <module 'ntpath' (frozen)> = os.path
+
+tests\env\test_env.py:59: AssertionError
+============================== warnings summary ===============================
+C:\Users\Asus\AppData\Local\Programs\Python\Python313\Lib\site-packages\pydantic\_internal\_config.py:323
+  C:\Users\Asus\AppData\Local\Programs\Python\Python313\Lib\site-packages\pydantic\_internal\_config.py:323: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    warnings.warn(DEPRECATION_MESSAGE, DeprecationWarning)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/env/test_env.py::test_env_variables - Failed: Missing critical A...
+FAILED tests/env/test_env.py::test_dependencies - Failed: Missing or broken d...
+FAILED tests/env/test_env.py::test_data_directories - AssertionError: Directo...
+======================== 3 failed, 1 warning in 27.03s ========================

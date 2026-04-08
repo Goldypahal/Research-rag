@@ -1,0 +1,54 @@
+﻿python : Traceback (most 
+recent call last):
+At line:1 char:22
++ ... ONPATH="."; python -c 
+"from 
+app.services.query_service 
+import QuerySe ...
++                 ~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: (Traceba  
+  ck (most recent call las   
+ t)::String) [], RemoteEx    
+ception
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+  File "<string>", line 1, 
+in <module>
+    from 
+app.services.query_service 
+import QueryService
+  File "G:\Desktop\RAG\resear
+ch_rag\app\services\query_ser
+vice.py", line 9, in <module>
+    from 
+..retrieval.hybrid_retriever 
+import HybridRetriever
+  File "G:\Desktop\RAG\resear
+ch_rag\app\retrieval\hybrid_r
+etriever.py", line 6, in 
+<module>
+    from 
+..indexing.bm25_index import 
+BM25Index
+  File "G:\Desktop\RAG\resear
+ch_rag\app\indexing\bm25_inde
+x.py", line 8, in <module>
+    class BM25Index:
+    ...<37 lines>...
+                self.chunks, 
+self.bm25 = pickle.load(f)
+  File "G:\Desktop\RAG\resear
+ch_rag\app\indexing\bm25_inde
+x.py", line 21, in BM25Index
+    def query(self, query: 
+str, k: int = 20, filters: 
+Optional[dict] = None):
+                             
+                         
+^^^^^^^^
+NameError: name 'Optional' 
+is not defined

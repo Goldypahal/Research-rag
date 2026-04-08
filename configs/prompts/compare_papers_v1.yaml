@@ -1,0 +1,9 @@
+template: |
+  Compare the following papers based on their {attributes}.
+  Use only the provided context.
+  
+  Paper 1: {paper1_context}
+  Paper 2: {paper2_context}
+  
+  Comparison:
+version: v1

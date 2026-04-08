@@ -1,0 +1,37 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.13.5, pytest-9.0.2, pluggy-1.6.0
+rootdir: G:\Desktop\RAG\research_rag
+plugins: anyio-4.10.0, langsmith-0.6.0
+collected 3 items
+
+tests\env\test_env.py F.F                                                [100%]
+
+================================== FAILURES ===================================
+_____________________________ test_env_variables ______________________________
+tests\env\test_env.py:21: in test_env_variables
+    pytest.fail(f"Missing critical API keys: {', '.join(missing_keys)}")
+E   Failed: Missing critical API keys: OPENAI_API_KEY, COHERE_API_KEY
+____________________________ test_data_directories ____________________________
+tests\env\test_env.py:59: in test_data_directories
+    assert os.path.exists(d), f"Directory {d} does not exist"
+E   AssertionError: Directory data/figures does not exist
+E   assert False
+E    +  where False = <built-in function _path_exists>('data/figures')
+E    +    where <built-in function _path_exists> = <module 'ntpath' (frozen)>.exists
+E    +      where <module 'ntpath' (frozen)> = os.path
+============================== warnings summary ===============================
+C:\Users\Asus\AppData\Local\Programs\Python\Python313\Lib\site-packages\pydantic\_internal\_config.py:323
+  C:\Users\Asus\AppData\Local\Programs\Python\Python313\Lib\site-packages\pydantic\_internal\_config.py:323: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    warnings.warn(DEPRECATION_MESSAGE, DeprecationWarning)
+
+tests/env/test_env.py::test_dependencies
+  <frozen importlib._bootstrap>:488: DeprecationWarning: Type google._upb._message.MessageMapContainer uses PyType_Spec with a metaclass that has custom tp_new. This is deprecated and will no longer be allowed in Python 3.14.
+
+tests/env/test_env.py::test_dependencies
+  <frozen importlib._bootstrap>:488: DeprecationWarning: Type google._upb._message.ScalarMapContainer uses PyType_Spec with a metaclass that has custom tp_new. This is deprecated and will no longer be allowed in Python 3.14.
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/env/test_env.py::test_env_variables - Failed: Missing critical A...
+FAILED tests/env/test_env.py::test_data_directories - AssertionError: Directo...
+=================== 2 failed, 1 passed, 3 warnings in 8.75s ===================

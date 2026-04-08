@@ -1,0 +1,54 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.13.5, pytest-9.0.2, pluggy-1.6.0 -- C:\Users\Asus\AppData\Local\Programs\Python\Python313\python.exe
+cachedir: .pytest_cache
+rootdir: G:\Desktop\RAG\research_rag
+plugins: anyio-4.10.0, langsmith-0.6.0
+collecting ... collected 6 items
+
+tests/unit/test_retry_utils.py::test_retry_logic_success PASSED          [ 16%]
+tests/unit/test_retry_utils.py::test_retry_logic_eventual_success PASSED [ 33%]
+tests/unit/test_retry_utils.py::test_retry_logic_failure PASSED          [ 50%]
+tests/unit/test_retry_utils.py::test_retry_logic_non_retryable PASSED    [ 66%]
+tests/unit/test_chunker.py::test_heading_tracker_logic PASSED            [ 83%]
+tests/unit/test_chunker.py::test_section_aware_chunker_splitting FAILED  [100%]
+
+================================== FAILURES ===================================
+____________________ test_section_aware_chunker_splitting _____________________
+
+    def test_section_aware_chunker_splitting():
+        chunker = SectionAwareChunker(chunk_size_tokens=100, chunk_overlap_tokens=10)
+    
+        # Mock paper with sections and text
+        paper = Paper(
+            paper_id="test_p",
+            source_path="fake.pdf",
+            title="Test Paper",
+            elements=[
+                ParsedElement(element_type="Title", text="1 Methods", metadata={"chunk_type": "heading"}),
+                ParsedElement(element_type="Text", text="This is some narrative text for testing."),
+                ParsedElement(element_type="Image", text="Figure 1: Accuracy Plot", metadata={"chunk_type": "figure"}),
+                ParsedElement(element_type="Title", text="2 Results", metadata={"chunk_type": "heading"}),
+                ParsedElement(element_type="Text", text="This is the result section.")
+            ]
+        )
+    
+        chunks = chunker.split(paper)
+    
+        # Should have separated figure and text, and respected sections
+        assert len(chunks) >= 3
+    
+        chunk_types = [c.chunk_type for c in chunks]
+        assert "figure" in chunk_types
+        assert "text" in chunk_types
+    
+        # Check section assignment
+        method_chunks = [c for c in chunks if c.section == "1 Methods"]
+        assert len(method_chunks) > 0
+>       assert any("Testing" in c.text for c in method_chunks)
+E       assert False
+E        +  where False = any(<generator object test_section_aware_chunker_splitting.<locals>.<genexpr> at 0x000001596F604380>)
+
+tests\unit\test_chunker.py:54: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/unit/test_chunker.py::test_section_aware_chunker_splitting - ass...
+========================= 1 failed, 5 passed in 0.47s =========================

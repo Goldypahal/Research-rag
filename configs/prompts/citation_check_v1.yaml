@@ -1,0 +1,8 @@
+template: |
+  Verify if the following claim is supported by the context.
+  Claim: {claim}
+  Context: {context}
+  
+  Supported: [Yes/No]
+  Reasoning:
+version: v1

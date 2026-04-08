@@ -1,0 +1,15 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.13.5, pytest-9.0.2, pluggy-1.6.0 -- C:\Users\Asus\AppData\Local\Programs\Python\Python313\python.exe
+cachedir: .pytest_cache
+rootdir: G:\Desktop\RAG\research_rag
+plugins: anyio-4.10.0, langsmith-0.6.0
+collecting ... collected 6 items
+
+tests/unit/test_retry_utils.py::test_retry_logic_success PASSED          [ 16%]
+tests/unit/test_retry_utils.py::test_retry_logic_eventual_success PASSED [ 33%]
+tests/unit/test_retry_utils.py::test_retry_logic_failure PASSED          [ 50%]
+tests/unit/test_retry_utils.py::test_retry_logic_non_retryable PASSED    [ 66%]
+tests/unit/test_chunker.py::test_heading_tracker_logic PASSED            [ 83%]
+tests/unit/test_chunker.py::test_section_aware_chunker_splitting PASSED  [100%]
+
+============================== 6 passed in 0.11s ==============================

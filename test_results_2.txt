@@ -1,0 +1,56 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.13.5, pytest-9.0.2, pluggy-1.6.0 -- C:\Users\Asus\AppData\Local\Programs\Python\Python313\python.exe
+cachedir: .pytest_cache
+rootdir: G:\Desktop\RAG\research_rag
+plugins: anyio-4.10.0, langsmith-0.6.0
+collecting ... collected 8 items / 3 errors
+
+=================================== ERRORS ====================================
+___________________ ERROR collecting tests/env/test_env.py ____________________
+ImportError while importing test module 'G:\Desktop\RAG\research_rag\tests\env\test_env.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Users\Asus\AppData\Local\Programs\Python\Python313\Lib\importlib\__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\env\test_env.py:4: in <module>
+    from app.core.settings import settings
+app\core\settings.py:1: in <module>
+    from pydantic_settings import BaseSettings
+E   ModuleNotFoundError: No module named 'pydantic_settings'
+_____________ ERROR collecting tests/integration/test_pipeline.py _____________
+ImportError while importing test module 'G:\Desktop\RAG\research_rag\tests\integration\test_pipeline.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Users\Asus\AppData\Local\Programs\Python\Python313\Lib\importlib\__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\integration\test_pipeline.py:3: in <module>
+    from app.services.query_service import QueryService
+app\services\query_service.py:9: in <module>
+    from ..retrieval.hybrid_retriever import HybridRetriever
+app\retrieval\hybrid_retriever.py:5: in <module>
+    from ..indexing.chroma_index import ChromaIndex
+app\indexing\chroma_index.py:2: in <module>
+    from langchain_chroma import Chroma
+E   ModuleNotFoundError: No module named 'langchain_chroma'
+__________________ ERROR collecting tests/unit/test_cloud.py __________________
+ImportError while importing test module 'G:\Desktop\RAG\research_rag\tests\unit\test_cloud.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Users\Asus\AppData\Local\Programs\Python\Python313\Lib\importlib\__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\unit\test_cloud.py:3: in <module>
+    from app.cloud.s3_ingestion_worker import S3IngestionWorker
+app\cloud\s3_ingestion_worker.py:4: in <module>
+    from .s3_watcher import S3Watcher
+app\cloud\s3_watcher.py:1: in <module>
+    import boto3
+E   ModuleNotFoundError: No module named 'boto3'
+=========================== short test summary info ===========================
+ERROR tests/env/test_env.py
+ERROR tests/integration/test_pipeline.py
+ERROR tests/unit/test_cloud.py
+!!!!!!!!!!!!!!!!!!! Interrupted: 3 errors during collection !!!!!!!!!!!!!!!!!!!
+============================== 3 errors in 1.30s ==============================

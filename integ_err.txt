@@ -1,0 +1,47 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.13.5, pytest-9.0.2, pluggy-1.6.0 -- C:\Users\Asus\AppData\Local\Programs\Python\Python313\python.exe
+cachedir: .pytest_cache
+rootdir: G:\Desktop\RAG\research_rag
+plugins: anyio-4.10.0, langsmith-0.6.0
+collecting ... collected 2 items
+
+tests/integration/test_pipeline.py::test_query_service_integration PASSED [ 50%]
+tests/integration/test_pipeline.py::test_multimodal_classification FAILED [100%]
+
+================================== FAILURES ===================================
+_______________________ test_multimodal_classification ________________________
+tests\integration\test_pipeline.py:75: in test_multimodal_classification
+    result = service.ask("Describe Figure 1")
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app\services\query_service.py:122: in ask
+    self._log_trace(query, retrieval_res, chunks, verified, latency)
+app\services\query_service.py:138: in _log_trace
+    f.write(json.dumps(trace) + "\n")
+            ^^^^^^^^^^^^^^^^^
+C:\Users\Asus\AppData\Local\Programs\Python\Python313\Lib\json\__init__.py:231: in dumps
+    return _default_encoder.encode(obj)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\Asus\AppData\Local\Programs\Python\Python313\Lib\json\encoder.py:200: in encode
+    chunks = self.iterencode(o, _one_shot=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\Asus\AppData\Local\Programs\Python\Python313\Lib\json\encoder.py:261: in iterencode
+    return _iterencode(o, 0)
+           ^^^^^^^^^^^^^^^^^
+C:\Users\Asus\AppData\Local\Programs\Python\Python313\Lib\json\encoder.py:180: in default
+    raise TypeError(f'Object of type {o.__class__.__name__} '
+E   TypeError: Object of type MagicMock is not JSON serializable
+============================== warnings summary ===============================
+<frozen importlib._bootstrap>:488
+  <frozen importlib._bootstrap>:488: DeprecationWarning: Type google._upb._message.MessageMapContainer uses PyType_Spec with a metaclass that has custom tp_new. This is deprecated and will no longer be allowed in Python 3.14.
+
+<frozen importlib._bootstrap>:488
+  <frozen importlib._bootstrap>:488: DeprecationWarning: Type google._upb._message.ScalarMapContainer uses PyType_Spec with a metaclass that has custom tp_new. This is deprecated and will no longer be allowed in Python 3.14.
+
+C:\Users\Asus\AppData\Local\Programs\Python\Python313\Lib\site-packages\pydantic\_internal\_config.py:323
+  C:\Users\Asus\AppData\Local\Programs\Python\Python313\Lib\site-packages\pydantic\_internal\_config.py:323: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    warnings.warn(DEPRECATION_MESSAGE, DeprecationWarning)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/integration/test_pipeline.py::test_multimodal_classification - T...
+=================== 1 failed, 1 passed, 3 warnings in 5.36s ===================

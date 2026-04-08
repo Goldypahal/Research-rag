@@ -1,0 +1,36 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.13.5, pytest-9.0.2, pluggy-1.6.0
+rootdir: G:\Desktop\RAG\research_rag
+plugins: anyio-4.10.0, langsmith-0.6.0
+collected 0 items / 1 error
+
+=================================== ERRORS ====================================
+_____________ ERROR collecting tests/integration/test_pipeline.py _____________
+tests\integration\test_pipeline.py:3: in <module>
+    from app.services.query_service import QueryService
+app\services\query_service.py:9: in <module>
+    from ..retrieval.hybrid_retriever import HybridRetriever
+app\retrieval\hybrid_retriever.py:6: in <module>
+    from ..indexing.bm25_index import BM25Index
+app\indexing\bm25_index.py:8: in <module>
+    class BM25Index:
+app\indexing\bm25_index.py:21: in BM25Index
+    def query(self, query: str, k: int = 20, filters: Optional[dict] = None):
+                                                      ^^^^^^^^
+E   NameError: name 'Optional' is not defined
+============================== warnings summary ===============================
+<frozen importlib._bootstrap>:488
+  <frozen importlib._bootstrap>:488: DeprecationWarning: Type google._upb._message.MessageMapContainer uses PyType_Spec with a metaclass that has custom tp_new. This is deprecated and will no longer be allowed in Python 3.14.
+
+<frozen importlib._bootstrap>:488
+  <frozen importlib._bootstrap>:488: DeprecationWarning: Type google._upb._message.ScalarMapContainer uses PyType_Spec with a metaclass that has custom tp_new. This is deprecated and will no longer be allowed in Python 3.14.
+
+C:\Users\Asus\AppData\Local\Programs\Python\Python313\Lib\site-packages\pydantic\_internal\_config.py:323
+  C:\Users\Asus\AppData\Local\Programs\Python\Python313\Lib\site-packages\pydantic\_internal\_config.py:323: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    warnings.warn(DEPRECATION_MESSAGE, DeprecationWarning)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+ERROR tests/integration/test_pipeline.py - NameError: name 'Optional' is not ...
+!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+======================== 3 warnings, 1 error in 6.16s =========================

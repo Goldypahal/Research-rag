@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Research RAG | Intelligent Insights</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Outfit:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --bg: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --accent: #22d3ee;
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            background-image: 
+                radial-gradient(circle at 0% 0%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 100% 100%, rgba(34, 211, 238, 0.1) 0%, transparent 50%);
+            color: var(--text-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        header {
+            padding: 2rem;
+            text-align: center;
+            border-bottom: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 2.5rem;
+            background: linear-gradient(to right, #fff, var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: var(--text-dim);
+            font-weight: 300;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 3rem auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 2rem;
+        }
+
+        .chat-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+
+        textarea {
+            width: 100%;
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid var(--glass-border);
+            border-radius: 1rem;
+            padding: 1.25rem;
+            color: white;
+            font-size: 1rem;
+            resize: none;
+            min-height: 100px;
+            transition: all 0.3s ease;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            font-size: 1rem;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.4);
+        }
+
+        .results-area {
+            margin-top: 2rem;
+        }
+
+        .answer-box {
+            line-height: 1.6;
+            font-size: 1.1rem;
+            color: #e2e8f0;
+            margin-bottom: 2rem;
+        }
+
+        .citations {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .citation-chip {
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            padding: 0.75rem 1.25rem;
+            border-radius: 0.75rem;
+            font-size: 0.875rem;
+            transition: background 0.2s;
+        }
+
+        .citation-chip:hover {
+            background: rgba(99, 102, 241, 0.2);
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #4ade80;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #4ade80;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #4ade80;
+        }
+
+        .metrics-card {
+            padding: 1.5rem;
+        }
+
+        .metric-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .metric-label {
+            color: var(--text-dim);
+            font-size: 0.875rem;
+        }
+
+        .metric-value {
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        #loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .loader {
+            width: 48px;
+            height: 48px;
+            border: 5px solid #FFF;
+            border-bottom-color: var(--primary);
+            border-radius: 50%;
+            display: inline-block;
+            box-sizing: border-box;
+            animation: rotation 1s linear infinite;
+        }
+
+        @keyframes rotation {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            main {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Research Intelligence</h1>
+        <p class="subtitle">Multi-paper RAG System powered by Gemini 1.5 Flash</p>
+    </header>
+
+    <main>
+        <div class="chat-section">
+            <div class="glass-card">
+                <div class="input-group">
+                    <textarea id="queryInput" placeholder="Ask a question about your research papers..."></textarea>
+                </div>
+                <div class="controls">
+                    <div class="status-badge">
+                        <div class="status-dot"></div>
+                        Gemini-Pro Connected
+                    </div>
+                    <button class="btn-primary" onclick="handleQuery()">Ask Question</button>
+                </div>
+            </div>
+
+            <div id="loading">
+                <span class="loader"></span>
+                <p style="margin-top: 1rem; color: var(--text-dim)">Synthesizing knowledge...</p>
+            </div>
+
+            <div id="results" class="glass-card results-area" style="display: none;">
+                <h3 style="margin-bottom: 1.5rem; color: var(--accent); font-family: 'Outfit';">Synthesized Answer</h3>
+                <div id="answer" class="answer-box"></div>
+                
+                <h4 style="margin-bottom: 1rem; font-size: 0.9rem; color: var(--text-dim); text-transform: uppercase;">Sources & Citations</h4>
+                <div id="citations" class="citations"></div>
+            </div>
+        </div>
+
+        <div class="sidebar">
+            <div class="glass-card metrics-card">
+                <h3 style="margin-bottom: 1rem; font-size: 1.1rem;">Session Metrics</h3>
+                <div class="metric-item">
+                    <span class="metric-label">Latency</span>
+                    <span id="latencyValue" class="metric-value">-</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Sources Used</span>
+                    <span id="sourceCount" class="metric-value">0</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">LLM Provider</span>
+                    <span class="metric-value">Google Gemini</span>
+                </div>
+            </div>
+
+            <div class="glass-card metrics-card">
+                <h3 style="margin-bottom: 1rem; font-size: 1.1rem;">Features</h3>
+                <ul style="list-style: none; color: var(--text-dim); font-size: 0.9rem; display: flex; flex-direction: column; gap: 0.5rem;">
+                    <li>✓ Section-aware retrieval</li>
+                    <li>✓ Multimodal figure analysis</li>
+                    <li>✓ Citation verification</li>
+                    <li>✓ JSON-based tracing</li>
+                </ul>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        async function handleQuery() {
+            const query = document.getElementById('queryInput').value;
+            if (!query.trim()) return;
+
+            // UI States
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('results').style.display = 'none';
+
+            try {
+                const response = await fetch('/api/v1/query', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        query: query,
+                        expand_context: true
+                    })
+                });
+
+                const data = await response.json();
+
+                // Display results
+                document.getElementById('answer').innerText = data.answer;
+                
+                const citationContainer = document.getElementById('citations');
+                citationContainer.innerHTML = '';
+                
+                if (data.chunks && data.chunks.length > 0) {
+                    data.chunks.forEach(chunk => {
+                        const chip = document.createElement('div');
+                        chip.className = 'citation-chip';
+                        chip.innerHTML = `<strong>${chunk.metadata ? chunk.metadata.title : 'Source'}</strong>: ${chunk.text.substring(0, 150)}...`;
+                        citationContainer.appendChild(chip);
+                    });
+                    document.getElementById('sourceCount').innerText = data.chunks.length;
+                }
+
+                document.getElementById('latencyValue').innerText = (data.latency).toFixed(2) + 's';
+                document.getElementById('results').style.display = 'block';
+
+            } catch (error) {
+                alert('Analysis failed. Check backend logs.');
+                console.error(error);
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

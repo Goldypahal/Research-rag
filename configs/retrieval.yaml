@@ -1,0 +1,9 @@
+hybrid:
+  chroma_k: 20
+  bm25_k: 20
+  fusion_k: 60
+  final_k: 30
+stage_2:
+  top_n: 8
+  primary: cohere
+  fallback: sbert
