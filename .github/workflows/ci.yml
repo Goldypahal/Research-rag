@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ main, master ]
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -32,8 +35,10 @@ jobs:
         GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
         COHERE_API_KEY: ${{ secrets.COHERE_API_KEY }}
       run: |
-        pytest tests/unit
-        # Integration tests might require API keys, so they're skipped if secrets aren't set
-        if [ -n "$GOOGLE_API_KEY" ]; then
-          pytest tests/integration
+        # Run unit tests
+        python -m pytest tests/unit
+        
+        # Integration tests might require API keys, so they're conditionally run
+        if [ -n "$GOOGLE_API_KEY" ] && [ -n "$COHERE_API_KEY" ]; then
+          python -m pytest tests/integration
         fi

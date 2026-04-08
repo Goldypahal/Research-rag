@@ -21,3 +21,5 @@ unstructured[pdf]
 boto3
 google-generativeai
 langchain-google-genai
+pytest
+pytest-mock
