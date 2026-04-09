@@ -32,12 +32,29 @@ class CitationEnforcer:
             # 1. Fast overlap filter to find candidates
             candidates = self._find_candidate_chunks(sent, chunks)
             
+    def _verify_with_llm(self, claim: str, context: str) -> bool:
+        """Isolated LLM check for easier mocking."""
+        if not self.llm: return False
+        res = self.llm.predict(self.prompt.format(claim=claim, context=context))
+        return "yes" in res.lower()
+
+    def enforce(self, answer: str, chunks: List[Chunk]) -> Dict[str, Any]:
+        # Split into sentences considering common abbreviations
+        sentence_endings = r'(?<![A-Z])(?<!et al)(?<!e\.g)(?<!i\.e)(?<!Fig)\.\s+'
+        sentences = [s.strip() for s in re.split(sentence_endings, answer) if s.strip()]
+        
+        supported_sentences: List[str] = []
+        citations: List[Dict[str, Any]] = []
+
+        for i, sent in enumerate(sentences):
+            # 1. Fast overlap filter to find candidates
+            candidates = self._find_candidate_chunks(sent, chunks)
+            
             # 2. LLM verification
             best_chunk = None
-            if candidates and self.llm:
+            if candidates:
                 for chunk in candidates:
-                    res = self.llm.predict(self.prompt.format(claim=sent, context=chunk.text))
-                    if "yes" in res.lower():
+                    if self._verify_with_llm(sent, chunk.text):
                         best_chunk = chunk
                         break
             

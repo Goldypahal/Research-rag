@@ -17,6 +17,11 @@ class FigureAnalyzer:
                 "data": f.read()
             }
 
+    def _call_vision_model(self, prompt: str, image_data: dict) -> str:
+        """Isolated Gemini vision call for easier mocking."""
+        response = self.model.generate_content([prompt, image_data])
+        return response.text
+
     @retry_api_call(max_attempts=3, min_wait=1, max_wait=10)
     def analyze_figure(self, image_path: str, question: str, caption: str = None) -> str:
         try:
@@ -36,8 +41,7 @@ Explain what the chart or table shows.
 Focus on trends, patterns, comparisons, and conclusions.
 """
 
-            response = self.model.generate_content([prompt, image_data])
-            return response.text
+            return self._call_vision_model(prompt, image_data)
         except Exception as exc:
             msg = str(exc).lower()
             if "timeout" in msg:

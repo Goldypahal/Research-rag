@@ -5,17 +5,17 @@ from app.evaluation.synthetic_dataset_generator import SyntheticDatasetGenerator
 
 def test_synthetic_qa_generation():
     """Verify that the generator parses LLM JSON output correctly."""
-    mock_response = MagicMock()
-    mock_response.choices[0].message.content = json.dumps([
+    mock_json = json.dumps([
         {"question": "What is X?", "answer": "X is Y"}
     ])
     
-    with patch("openai.resources.chat.completions.Completions.create", return_value=mock_response):
-        generator = SyntheticDatasetGenerator(api_key="fake")
+    generator = SyntheticDatasetGenerator(api_key="fake")
+    with patch.object(generator, "_call_llm", return_value=mock_json):
         qa_pairs = generator.generate_qa_pairs("This is paper text about X.")
         
         assert len(qa_pairs) == 1
         assert qa_pairs[0]["question"] == "What is X?"
+        assert qa_pairs[0]["answer"] == "X is Y"
 
 def test_save_dataset_jsonl(tmp_path):
     """Verify that QA pairs are saved correctly in JSONL format."""

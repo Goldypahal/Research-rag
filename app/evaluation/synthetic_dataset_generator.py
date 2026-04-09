@@ -13,6 +13,16 @@ class SyntheticDatasetGenerator:
         self.model = genai.GenerativeModel("gemini-1.5-flash")
         self.api_key = api_key
 
+    def _call_llm(self, prompt: str) -> str:
+        """Isolated LLM call for easier mocking in tests."""
+        # Gemini 1.5 Flash supports system instructions and simplified JSON response
+        model = genai.GenerativeModel(
+            model_name="gemini-1.5-flash",
+            generation_config={"response_mime_type": "application/json"}
+        )
+        response = model.generate_content(prompt)
+        return response.text
+
     @retry_api_call(max_attempts=3, min_wait=2, max_wait=15)
     def generate_qa_pairs(self, paper_text: str, num_questions: int = 5) -> List[Dict[str, str]]:
         """
@@ -31,15 +41,7 @@ Text:
 {paper_text[:8000]} # Truncate to avoid context window issues
 """
         try:
-            # Gemini 1.5 Flash supports system instructions and simplified JSON response
-            model = genai.GenerativeModel(
-                model_name="gemini-1.5-flash",
-                generation_config={"response_mime_type": "application/json"}
-            )
-            
-            response = model.generate_content(prompt)
-            content = response.text
-            
+            content = self._call_llm(prompt)
             data = json.loads(content)
             # Handle variations in output format
             if isinstance(data, dict):
