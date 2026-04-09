@@ -9,13 +9,15 @@ def test_synthetic_qa_generation():
         {"question": "What is X?", "answer": "X is Y"}
     ])
     
+    # Triggering new CI run with updated mocks
     generator = SyntheticDatasetGenerator(api_key="fake")
-    with patch.object(generator, "_call_llm", return_value=mock_json):
+    with patch.object(generator, "_call_llm", return_value=mock_json) as mock_llm:
         qa_pairs = generator.generate_qa_pairs("This is paper text about X.")
         
         assert len(qa_pairs) == 1
         assert qa_pairs[0]["question"] == "What is X?"
         assert qa_pairs[0]["answer"] == "X is Y"
+        mock_llm.assert_called_once()
 
 def test_save_dataset_jsonl(tmp_path):
     """Verify that QA pairs are saved correctly in JSONL format."""
