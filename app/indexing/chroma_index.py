@@ -17,12 +17,10 @@ class ChromaIndex:
     def _make_cloud_embeddings(self):
         """Build Google GenAI embeddings (langchain-google-genai >= 4.x)."""
         from langchain_google_genai import GoogleGenerativeAIEmbeddings
-        # langchain-google-genai 4.x uses google-genai SDK (v1 endpoint).
-        # Model name must NOT have 'models/' prefix in the new SDK.
+        # Use gemini-embedding-2 which is fully supported on the Developer API
         return GoogleGenerativeAIEmbeddings(
-            model="text-embedding-004",
+            model="gemini-embedding-2",
             google_api_key=settings.GOOGLE_API_KEY,
-            task_type="RETRIEVAL_DOCUMENT",
         )
 
     def _make_local_embeddings(self):
