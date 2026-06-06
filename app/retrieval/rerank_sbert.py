@@ -1,6 +1,5 @@
 from __future__ import annotations
 from typing import List
-from sentence_transformers import CrossEncoder
 from ..models.chunk import Chunk
 
 class SBERTReranker:
@@ -9,8 +8,16 @@ class SBERTReranker:
         model_name: str = "cross-encoder/ms-marco-MiniLM-L-6-v2",
         top_n: int = 8,
     ):
-        self.model = CrossEncoder(model_name)
+        self.model_name = model_name
         self.top_n = top_n
+        self._model = None
+
+    @property
+    def model(self):
+        if self._model is None:
+            from sentence_transformers import CrossEncoder
+            self._model = CrossEncoder(self.model_name)
+        return self._model
 
     def rerank(self, query: str, chunks: List[Chunk]) -> List[Chunk]:
         if not chunks:

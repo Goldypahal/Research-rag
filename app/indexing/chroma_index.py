@@ -1,9 +1,7 @@
-from __future__ import annotations
-from langchain_chroma import Chroma
-from langchain_ollama import OllamaEmbeddings
 from typing import List, Optional
 from ..models.chunk import Chunk
 from ..core.settings import settings
+from ..core.connectivity import mode_manager, LLMMode
 from ..core.retry_utils import (
     APIRateLimitError,
     APIServerError,
@@ -13,15 +11,40 @@ from ..core.retry_utils import (
 
 class ChromaIndex:
     def __init__(self):
-        self.embeddings = OllamaEmbeddings(
-            model=settings.OLLAMA_EMBED_MODEL,
-            base_url=settings.OLLAMA_BASE_URL
-        )
-        self.vector_store = Chroma(
-            persist_directory=settings.CHROMA_DB_PATH,
-            embedding_function=self.embeddings,
-            collection_name="research_papers"
-        )
+        self._local_vector_store = None
+        self._cloud_vector_store = None
+
+    @property
+    def vector_store(self):
+        from langchain_chroma import Chroma
+        
+        # Switch vector store & embedding model dynamically
+        if mode_manager.mode == LLMMode.CLOUD and settings.GOOGLE_API_KEY:
+            if self._cloud_vector_store is None:
+                from langchain_google_genai import GoogleGenerativeAIEmbeddings
+                embeddings = GoogleGenerativeAIEmbeddings(
+                    model="models/text-embedding-004",
+                    google_api_key=settings.GOOGLE_API_KEY
+                )
+                self._cloud_vector_store = Chroma(
+                    persist_directory=settings.CHROMA_DB_PATH + "_cloud",
+                    embedding_function=embeddings,
+                    collection_name="research_papers_cloud"
+                )
+            return self._cloud_vector_store
+        else:
+            if self._local_vector_store is None:
+                from langchain_ollama import OllamaEmbeddings
+                embeddings = OllamaEmbeddings(
+                    model=settings.OLLAMA_EMBED_MODEL,
+                    base_url=settings.OLLAMA_BASE_URL
+                )
+                self._local_vector_store = Chroma(
+                    persist_directory=settings.CHROMA_DB_PATH,
+                    embedding_function=embeddings,
+                    collection_name="research_papers"
+                )
+            return self._local_vector_store
 
     @retry_api_call(max_attempts=4, min_wait=1, max_wait=10)
     def _add_texts_with_retry(self, texts: List[str], metadatas: List[dict], ids: List[str]):

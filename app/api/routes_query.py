@@ -19,18 +19,25 @@ chroma = ChromaIndex()
 bm25   = BM25Index()
 
 # ── Mode-aware components (rebuilt when mode switches) ────────────────────────
-_generator, _enforcer, _reranker = build_components()
-_retriever = HybridRetriever(chroma, bm25, reranker=_reranker)
-_query_service = QueryService(_retriever, _generator, _enforcer)
+_query_service = None
 
+def get_query_service() -> QueryService:
+    """Lazy initialization of the QueryService to prevent startup blocks."""
+    global _query_service
+    if _query_service is None:
+        generator, enforcer, reranker = build_components()
+        retriever = HybridRetriever(chroma, bm25, reranker=reranker)
+        _query_service = QueryService(retriever, generator, enforcer)
+    return _query_service
 
 def _rebuild_service() -> None:
     """Rebuild all mode-sensitive components in-place."""
-    global _generator, _enforcer, _reranker, _retriever, _query_service
-    _generator, _enforcer, _reranker = build_components()
-    _retriever    = HybridRetriever(chroma, bm25, reranker=_reranker)
-    _query_service = QueryService(_retriever, _generator, _enforcer)
+    global _query_service
+    generator, enforcer, reranker = build_components()
+    retriever = HybridRetriever(chroma, bm25, reranker=reranker)
+    _query_service = QueryService(retriever, generator, enforcer)
     logger.info(f"Pipeline rebuilt for mode: {mode_manager.mode.value.upper()}")
+
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -151,7 +158,8 @@ def build_evaluation_metrics(result: dict) -> dict:
 @router.post("/query", response_model=QueryResponse)
 async def query_rag(request: QueryRequest):
     filters = {"paper_id": request.paper_ids} if request.paper_ids else None
-    result  = _query_service.ask(
+    query_service = get_query_service()
+    result  = query_service.ask(
         request.query,
         filters=filters,
         expand_context=request.expand_context,
@@ -171,7 +179,8 @@ async def compare_papers(request: QueryRequest):
     if not request.paper_ids or len(request.paper_ids) < 2:
         raise HTTPException(status_code=400, detail="Comparison requires at least two paper_ids.")
 
-    result = _query_service.ask(
+    query_service = get_query_service()
+    result = query_service.ask(
         request.query,
         filters={"paper_id": request.paper_ids},
         prompt_version=request.prompt_version,
