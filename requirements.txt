@@ -11,7 +11,7 @@ langchain-ollama
 chromadb
 rank_bm25
 sentence-transformers
-ragas
+# ragas  # Optional: Uncomment if offline evaluations are needed (requires C++ compilers on Windows for scikit-network)
 PyMuPDF
 pyyaml
 pandas

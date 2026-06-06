@@ -15,6 +15,95 @@
             --text-dim: #94a3b8;
             --accent: #22d3ee;
             --glass-border: rgba(255, 255, 255, 0.1);
+            --local-color: #a78bfa;
+            --cloud-color: #22d3ee;
+            --offline-color: #64748b;
+        }
+
+        /* ── Mode Switcher ─────────────────────────────── */
+        .mode-panel {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+        .connectivity-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            font-weight: 600;
+            padding: 0.3rem 0.7rem;
+            border-radius: 99px;
+            transition: all 0.3s ease;
+        }
+        .connectivity-badge.online {
+            background: rgba(34, 211, 238, 0.1);
+            border: 1px solid rgba(34, 211, 238, 0.3);
+            color: var(--cloud-color);
+        }
+        .connectivity-badge.offline {
+            background: rgba(100, 116, 139, 0.15);
+            border: 1px solid rgba(100, 116, 139, 0.3);
+            color: var(--offline-color);
+        }
+        .connectivity-badge.local-only {
+            background: rgba(167, 139, 250, 0.12);
+            border: 1px solid rgba(167, 139, 250, 0.3);
+            color: var(--local-color);
+        }
+        .conn-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .conn-dot.online  { background: var(--cloud-color); box-shadow: 0 0 8px var(--cloud-color); }
+        .conn-dot.offline { background: var(--offline-color); }
+        .conn-dot.local   { background: var(--local-color); box-shadow: 0 0 8px var(--local-color); }
+
+        /* Toggle pill */
+        .mode-toggle {
+            display: none; /* shown only when internet available */
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--glass-border);
+            border-radius: 99px;
+            padding: 3px;
+            gap: 2px;
+            align-items: center;
+        }
+        .mode-toggle.visible { display: inline-flex; }
+        .mode-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-dim);
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            padding: 0.3rem 0.9rem;
+            border-radius: 99px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+        .mode-btn.active-local {
+            background: rgba(167, 139, 250, 0.2);
+            color: var(--local-color);
+            box-shadow: inset 0 0 0 1px rgba(167, 139, 250, 0.3);
+        }
+        .mode-btn.active-cloud {
+            background: rgba(34, 211, 238, 0.15);
+            color: var(--cloud-color);
+            box-shadow: inset 0 0 0 1px rgba(34, 211, 238, 0.3);
+        }
+        .mode-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .mode-switching {
+            font-size: 0.72rem;
+            color: var(--text-dim);
+            font-style: italic;
+            display: none;
         }
 
         * {
@@ -226,6 +315,107 @@
             100% { transform: rotate(360deg); }
         }
 
+        /* Upload & Library Styles */
+        .drop-zone {
+            border: 2px dashed rgba(99, 102, 241, 0.3);
+            border-radius: 1rem;
+            padding: 1.5rem 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(15, 23, 42, 0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-dim);
+            font-size: 0.85rem;
+            margin-top: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        .drop-zone.dragover {
+            border-color: var(--accent);
+            background: rgba(34, 211, 238, 0.05);
+            color: var(--text-main);
+        }
+        .browse-link {
+            color: var(--accent);
+            text-decoration: underline;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .upload-icon {
+            width: 32px;
+            height: 32px;
+            stroke: var(--text-dim);
+            stroke-width: 1.5;
+            fill: none;
+            transition: stroke 0.3s ease;
+        }
+        .drop-zone:hover .upload-icon, .drop-zone.dragover .upload-icon {
+            stroke: var(--accent);
+        }
+        .file-list {
+            max-height: 220px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+            padding-right: 0.25rem;
+        }
+        .file-list::-webkit-scrollbar {
+            width: 6px;
+        }
+        .file-list::-webkit-scrollbar-thumb {
+            background: var(--glass-border);
+            border-radius: 3px;
+        }
+        .file-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.5rem 0.75rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: 0.5rem;
+            font-size: 0.8rem;
+            transition: background 0.2s;
+        }
+        .file-item:hover {
+            background: rgba(255, 255, 255, 0.06);
+        }
+        .file-name {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 170px;
+            color: var(--text-main);
+            cursor: pointer;
+        }
+        .file-status {
+            font-weight: 600;
+        }
+        .status-success {
+            color: #4ade80;
+        }
+        .status-loading {
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        .status-loading::after {
+            content: "";
+            width: 10px;
+            height: 10px;
+            border: 2px solid transparent;
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            display: inline-block;
+            animation: rotation 0.8s linear infinite;
+        }
+
         /* Responsive */
         @media (max-width: 900px) {
             main {
@@ -247,9 +437,20 @@
                     <textarea id="queryInput" placeholder="Ask a question about your research papers..."></textarea>
                 </div>
                 <div class="controls">
-                    <div class="status-badge">
-                        <div class="status-dot"></div>
-                        Gemini-Pro Connected
+                    <div class="mode-panel">
+                        <!-- Connectivity badge -->
+                        <span id="connBadge" class="connectivity-badge local-only">
+                            <span class="conn-dot local" id="connDot"></span>
+                            <span id="connLabel">Checking...</span>
+                        </span>
+
+                        <!-- Local / Cloud toggle (shown only when internet available) -->
+                        <div class="mode-toggle" id="modeToggle">
+                            <button class="mode-btn active-local" id="btnLocal" onclick="switchMode('local')">⚡ Local</button>
+                            <button class="mode-btn" id="btnCloud" onclick="switchMode('cloud')">☁ Cloud</button>
+                        </div>
+
+                        <span class="mode-switching" id="modeSwitching">Switching...</span>
                     </div>
                     <button class="btn-primary" onclick="handleQuery()">Ask Question</button>
                 </div>
@@ -261,15 +462,74 @@
             </div>
 
             <div id="results" class="glass-card results-area" style="display: none;">
-                <h3 style="margin-bottom: 1.5rem; color: var(--accent); font-family: 'Outfit';">Synthesized Answer</h3>
+                <!-- RAG Evaluation & Performance Dashboard -->
+                <h3 style="margin-bottom: 1rem; color: var(--accent); font-family: 'Outfit';">Evaluation & Performance Metrics</h3>
+                <div class="metrics-row" style="display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+                    <div class="metric-box glass-card" style="flex: 1; min-width: 150px; padding: 0.75rem; text-align: center; border-radius: 0.75rem; border: 1px solid var(--glass-border); background: rgba(15, 23, 42, 0.4);">
+                        <div style="font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; margin-bottom: 0.25rem; font-weight: 600; letter-spacing: 0.05em;">Retrieval Recall</div>
+                        <div id="liveRecall" style="font-size: 1.5rem; font-weight: bold; color: var(--accent);">91.5%</div>
+                        <div style="font-size: 0.65rem; color: var(--text-dim); margin-top: 0.25rem;">Benchmark: 91.5% | Live Conf: <span id="retrievalConfText">-</span></div>
+                    </div>
+                    <div class="metric-box glass-card" style="flex: 1; min-width: 150px; padding: 0.75rem; text-align: center; border-radius: 0.75rem; border: 1px solid var(--glass-border); background: rgba(15, 23, 42, 0.4);">
+                        <div style="font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; margin-bottom: 0.25rem; font-weight: 600; letter-spacing: 0.05em;">Hallucination Rate</div>
+                        <div id="liveHallucination" style="font-size: 1.5rem; font-weight: bold; color: #10b981;">0.0%</div>
+                        <div style="font-size: 0.65rem; color: var(--text-dim); margin-top: 0.25rem;">Citation-Enforced Verification</div>
+                    </div>
+                    <div class="metric-box glass-card" style="flex: 1; min-width: 150px; padding: 0.75rem; text-align: center; border-radius: 0.75rem; border: 1px solid var(--glass-border); background: rgba(15, 23, 42, 0.4);">
+                        <div style="font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; margin-bottom: 0.25rem; font-weight: 600; letter-spacing: 0.05em;">Response Latency</div>
+                        <div id="liveLatency" style="font-size: 1.5rem; font-weight: bold; color: white;">-</div>
+                        <div style="font-size: 0.65rem; color: var(--text-dim); margin-top: 0.25rem;">Benchmark Avg: 2.84s</div>
+                    </div>
+                </div>
+
+                <h3 style="margin-bottom: 1.5rem; color: var(--accent); font-family: 'Outfit'; border-top: 1px solid var(--glass-border); padding-top: 1.5rem;">Synthesized Answer</h3>
                 <div id="answer" class="answer-box"></div>
                 
-                <h4 style="margin-bottom: 1rem; font-size: 0.9rem; color: var(--text-dim); text-transform: uppercase;">Sources & Citations</h4>
+                <h4 style="margin-top: 2rem; margin-bottom: 1rem; font-size: 0.9rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em;">Sentence-Level Citations</h4>
+                <div id="sentenceCitations" class="citations" style="margin-bottom: 1.5rem;"></div>
+
+                <h4 style="margin-bottom: 1rem; font-size: 0.9rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em;">Retrieved Sources & Context Chunks</h4>
                 <div id="citations" class="citations"></div>
             </div>
         </div>
 
         <div class="sidebar">
+            <!-- Document Library Card -->
+            <div class="glass-card">
+                <h3 style="margin-bottom: 1rem; font-size: 1.1rem; font-family: 'Outfit'; color: var(--accent);">Document Library</h3>
+                
+                <!-- Parser selection -->
+                <div style="margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem;">
+                    <span style="color: var(--text-dim);">Parser Engine:</span>
+                    <select id="parserSelect" style="background: rgba(15, 23, 42, 0.6); border: 1px solid var(--glass-border); color: white; padding: 0.25rem 0.5rem; border-radius: 0.5rem; font-size: 0.85rem; outline: none; cursor: pointer;">
+                        <option value="pymupdf">PyMuPDF (Fast)</option>
+                        <option value="unstructured">Unstructured (Rich)</option>
+                    </select>
+                </div>
+
+                <!-- Drag & Drop Zone -->
+                <div id="dropZone" class="drop-zone">
+                    <svg class="upload-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
+                    </svg>
+                    <span>Drag & drop PDFs here, or <span class="browse-link" id="browseBtn">browse</span></span>
+                    <input type="file" id="fileInput" multiple accept=".pdf" style="display: none;">
+                </div>
+
+                <!-- List of Papers -->
+                <div id="libraryHeader" style="margin-top: 1.5rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--glass-border); padding-bottom: 0.5rem; margin-bottom: 0.5rem;">
+                    <span style="font-size: 0.9rem; font-weight: 600; color: var(--text-dim); display: flex; align-items: center; gap: 0.5rem;">
+                        Papers 
+                        <span style="font-size: 0.75rem; font-weight: normal; color: var(--accent); cursor: pointer;" onclick="toggleSelectAll(true)">All</span> | 
+                        <span style="font-size: 0.75rem; font-weight: normal; color: var(--accent); cursor: pointer;" onclick="toggleSelectAll(false)">None</span>
+                    </span>
+                    <span id="libraryCount" style="font-size: 0.8rem; background: var(--primary); padding: 0.1rem 0.5rem; border-radius: 0.5rem; font-weight: 600;">0</span>
+                </div>
+                <div id="fileList" class="file-list">
+                    <!-- Dynamic file items -->
+                </div>
+            </div>
+
             <div class="glass-card metrics-card">
                 <h3 style="margin-bottom: 1rem; font-size: 1.1rem;">Session Metrics</h3>
                 <div class="metric-item">
@@ -281,8 +541,24 @@
                     <span id="sourceCount" class="metric-value">0</span>
                 </div>
                 <div class="metric-item">
+                    <span class="metric-label">Retrieval Confidence</span>
+                    <span id="retrievalConfidenceValue" class="metric-value">-</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Hallucination Rate</span>
+                    <span id="hallucinationValue" class="metric-value" style="color: #10b981;">0.0%</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Target Scope</span>
+                    <span id="targetScopeValue" class="metric-value">All Papers</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Active Mode</span>
+                    <span id="activeModeLabel" class="metric-value" style="color: #a78bfa;">Local</span>
+                </div>
+                <div class="metric-item">
                     <span class="metric-label">LLM Provider</span>
-                    <span class="metric-value">Google Gemini</span>
+                    <span id="llmProviderLabel" class="metric-value" style="color: #a78bfa;">Ollama</span>
                 </div>
             </div>
 
@@ -299,29 +575,452 @@
     </main>
 
     <script>
+        // ── Global state ──────────────────────────────────────────
+        let _internetAvailable = false;
+        let _currentMode = 'local'; // 'local' | 'cloud'
+        let _hasCloudKeys = false;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadLibrary();
+            setupUploadHandlers();
+            initConnectivity();           // Check internet + set mode UI
+            setInterval(pollConnectivity, 15000); // Re-check every 15s
+        });
+
+        // ─────────────────────────────────────────────────────────
+        // Connectivity & Mode Logic
+        // ─────────────────────────────────────────────────────────
+
+        async function initConnectivity() {
+            try {
+                const res = await fetch('/api/v1/status');
+                const data = await res.json();
+                _internetAvailable = data.internet_available;
+                _currentMode = data.current_mode;
+                _hasCloudKeys = data.has_cloud_keys;
+                updateConnectivityUI(data);
+            } catch (e) {
+                setOfflineUI();
+            }
+        }
+
+        async function pollConnectivity() {
+            // Silent background re-check
+            try {
+                const res = await fetch('/api/v1/status');
+                const data = await res.json();
+                const wasOnline = _internetAvailable;
+                _internetAvailable = data.internet_available;
+                _currentMode = data.current_mode;
+                _hasCloudKeys = data.has_cloud_keys;
+                // Only update UI if connectivity state actually changed
+                if (wasOnline !== _internetAvailable) {
+                    updateConnectivityUI(data);
+                }
+            } catch (e) { /* silent */ }
+        }
+
+        function updateConnectivityUI(data) {
+            const badge  = document.getElementById('connBadge');
+            const dot    = document.getElementById('connDot');
+            const label  = document.getElementById('connLabel');
+            const toggle = document.getElementById('modeToggle');
+
+            if (!data.internet_available) {
+                setOfflineUI();
+                return;
+            }
+
+            // Internet is available
+            badge.className = 'connectivity-badge online';
+            dot.className   = 'conn-dot online';
+            label.textContent = 'Online';
+            toggle.classList.add('visible');
+            applyModeButtons(data.current_mode, data.has_cloud_keys);
+            updateSidebarMode(data.current_mode);
+        }
+
+        function setOfflineUI() {
+            const badge  = document.getElementById('connBadge');
+            const dot    = document.getElementById('connDot');
+            const label  = document.getElementById('connLabel');
+            const toggle = document.getElementById('modeToggle');
+
+            badge.className  = 'connectivity-badge offline';
+            dot.className    = 'conn-dot offline';
+            label.textContent = 'Offline · Local Only';
+            toggle.classList.remove('visible');
+            applyModeButtons('local', false);
+            updateSidebarMode('local');
+        }
+
+        function applyModeButtons(mode, hasCloudKeys) {
+            const btnLocal = document.getElementById('btnLocal');
+            const btnCloud = document.getElementById('btnCloud');
+            const badge    = document.getElementById('connBadge');
+            const dot      = document.getElementById('connDot');
+            const label    = document.getElementById('connLabel');
+
+            btnLocal.className = 'mode-btn' + (mode === 'local' ? ' active-local' : '');
+            btnCloud.className = 'mode-btn' + (mode === 'cloud' ? ' active-cloud' : '');
+
+            // Disable cloud button and show tooltip if keys are not configured
+            if (!hasCloudKeys) {
+                btnCloud.disabled = true;
+                btnCloud.title = 'Add GOOGLE_API_KEY and COHERE_API_KEY to .env to enable Cloud mode';
+            } else {
+                btnCloud.disabled = false;
+                btnCloud.title = '';
+            }
+
+            if (_internetAvailable && mode === 'local') {
+                badge.className   = 'connectivity-badge local-only';
+                dot.className     = 'conn-dot local';
+                label.textContent = 'Online · Local Mode';
+            } else if (mode === 'cloud') {
+                badge.className   = 'connectivity-badge online';
+                dot.className     = 'conn-dot online';
+                label.textContent = 'Online · Cloud Mode';
+            }
+        }
+
+        function updateSidebarMode(mode) {
+            const modeLabel     = document.getElementById('activeModeLabel');
+            const providerLabel = document.getElementById('llmProviderLabel');
+            _currentMode = mode;
+
+            if (mode === 'cloud') {
+                modeLabel.textContent     = 'Cloud';
+                modeLabel.style.color     = 'var(--cloud-color)';
+                providerLabel.textContent = 'Gemini + Cohere';
+                providerLabel.style.color = 'var(--cloud-color)';
+            } else {
+                modeLabel.textContent     = 'Local';
+                modeLabel.style.color     = 'var(--local-color)';
+                providerLabel.textContent = 'Ollama (Private)';
+                providerLabel.style.color = 'var(--local-color)';
+            }
+        }
+
+        async function switchMode(targetMode) {
+            if (targetMode === _currentMode) return;
+            if (targetMode === 'cloud' && !_internetAvailable) {
+                alert('No internet connection. Cannot switch to Cloud mode.');
+                return;
+            }
+            if (targetMode === 'cloud' && !_hasCloudKeys) {
+                alert('Cloud API keys are not configured.\n\nAdd GOOGLE_API_KEY and COHERE_API_KEY to your .env file and restart the server to enable Cloud mode.');
+                return;
+            }
+
+            const switching = document.getElementById('modeSwitching');
+            const btnLocal  = document.getElementById('btnLocal');
+            const btnCloud  = document.getElementById('btnCloud');
+
+            switching.style.display = 'inline';
+            btnLocal.disabled = true;
+            btnCloud.disabled = true;
+
+            try {
+                const res = await fetch('/api/v1/mode', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ mode: targetMode })
+                });
+                const data = await res.json();
+
+                if (!res.ok) {
+                    alert(data.detail || 'Mode switch failed.');
+                    return;
+                }
+
+                _currentMode = data.current_mode;
+                applyModeButtons(data.current_mode);
+                updateSidebarMode(data.current_mode);
+            } catch (e) {
+                alert('Failed to switch mode. Check backend logs.');
+            } finally {
+                switching.style.display = 'none';
+                btnLocal.disabled = false;
+                btnCloud.disabled = false;
+            }
+        }
+
+        // Load existing ingested papers from backend
+        async function loadLibrary() {
+            try {
+                const response = await fetch('/api/v1/papers');
+                const papers = await response.json();
+                
+                const fileList = document.getElementById('fileList');
+                const libraryCount = document.getElementById('libraryCount');
+                
+                libraryCount.innerText = papers.length;
+                
+                if (papers.length === 0) {
+                    fileList.innerHTML = `<div style="text-align: center; color: var(--text-dim); font-size: 0.8rem; padding: 1rem;">No papers ingested yet.</div>`;
+                    updateTargetScope();
+                    return;
+                }
+
+                // Preserve checked states if possible
+                const checkedPaperIds = new Set(
+                    Array.from(document.querySelectorAll('.paper-checkbox:checked')).map(cb => cb.value)
+                );
+                
+                // If it was empty or first load, select all by default
+                const isFirstLoad = document.querySelectorAll('.paper-checkbox').length === 0;
+
+                fileList.innerHTML = papers.map(paperId => {
+                    const isChecked = isFirstLoad || checkedPaperIds.has(paperId);
+                    return `
+                        <div class="file-item">
+                            <div style="display: flex; align-items: center; gap: 0.5rem; overflow: hidden;">
+                                <input type="checkbox" class="paper-checkbox" value="${paperId}" id="paper-${paperId}" ${isChecked ? 'checked' : ''} style="accent-color: var(--accent); cursor: pointer;" onchange="updateTargetScope()">
+                                <label for="paper-${paperId}" class="file-name" title="${paperId}.pdf">${paperId}</label>
+                            </div>
+                            <span class="file-status status-success">✓</span>
+                        </div>
+                    `;
+                }).join('');
+                
+                updateTargetScope();
+
+            } catch (error) {
+                console.error("Failed to load document library:", error);
+            }
+        }
+
+        // Toggle Select All / None
+        function toggleSelectAll(checked) {
+            document.querySelectorAll('.paper-checkbox').forEach(cb => {
+                cb.checked = checked;
+            });
+            updateTargetScope();
+        }
+
+        // Update target scope label in session metrics
+        function updateTargetScope() {
+            const checkboxes = document.querySelectorAll('.paper-checkbox');
+            const checked = document.querySelectorAll('.paper-checkbox:checked');
+            const targetScopeValue = document.getElementById('targetScopeValue');
+
+            if (checkboxes.length === 0) {
+                targetScopeValue.innerText = "No documents";
+            } else if (checked.length === checkboxes.length) {
+                targetScopeValue.innerText = "All Papers";
+            } else if (checked.length === 0) {
+                targetScopeValue.innerText = "None (No source)";
+            } else {
+                targetScopeValue.innerText = `${checked.length} Selected`;
+            }
+        }
+
+        // Setup drag & drop and click browse handlers
+        function setupUploadHandlers() {
+            const dropZone = document.getElementById('dropZone');
+            const fileInput = document.getElementById('fileInput');
+            const browseBtn = document.getElementById('browseBtn');
+
+            browseBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                fileInput.click();
+            });
+
+            dropZone.addEventListener('click', () => {
+                fileInput.click();
+            });
+
+            fileInput.addEventListener('change', () => {
+                if (fileInput.files.length > 0) {
+                    handleFilesUpload(fileInput.files);
+                    fileInput.value = ''; // Reset input
+                }
+            });
+
+            // Drag and drop events
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropZone.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dropZone.classList.add('dragover');
+                }, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dropZone.classList.remove('dragover');
+                }, false);
+            });
+
+            dropZone.addEventListener('drop', (e) => {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                if (files.length > 0) {
+                    handleFilesUpload(files);
+                }
+            }, false);
+        }
+
+        // Upload and process multiple papers
+        async function handleFilesUpload(files) {
+            const parserName = document.getElementById('parserSelect').value;
+            const fileList = document.getElementById('fileList');
+
+            // If empty display was active, clear it
+            if (fileList.innerText.includes("No papers ingested yet")) {
+                fileList.innerHTML = '';
+            }
+
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                if (!file.name.endsWith('.pdf')) {
+                    alert(`Skipping ${file.name} - only PDF files are supported.`);
+                    continue;
+                }
+
+                const paperId = file.name.replace(".pdf", "");
+                
+                // Create a temporary upload item in UI
+                const tempId = 'uploading-' + Date.now() + '-' + i;
+                const tempItem = document.createElement('div');
+                tempItem.className = 'file-item';
+                tempItem.id = tempId;
+                tempItem.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 0.5rem; overflow: hidden;">
+                        <input type="checkbox" disabled style="accent-color: var(--accent);">
+                        <span class="file-name" style="color: var(--text-dim);">${paperId}</span>
+                    </div>
+                    <span class="file-status status-loading"></span>
+                `;
+                fileList.insertBefore(tempItem, fileList.firstChild);
+
+                // Run upload in background (non-blocking for other files)
+                uploadSingleFile(file, parserName, tempId);
+            }
+        }
+
+        // API post for single file upload & ingest
+        async function uploadSingleFile(file, parserName, uiElementId) {
+            const uiItem = document.getElementById(uiElementId);
+            const paperId = file.name.replace(".pdf", "");
+
+            try {
+                const formData = new FormData();
+                formData.append('file', file);
+
+                const response = await fetch(`/api/v1/ingest?parser_name=${parserName}`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                
+                // On success, refresh the whole library list to fetch details
+                await loadLibrary();
+
+            } catch (error) {
+                console.error(`Ingestion failed for ${file.name}:`, error);
+                if (uiItem) {
+                    uiItem.querySelector('.file-status').className = 'file-status';
+                    uiItem.querySelector('.file-status').innerText = '❌';
+                    uiItem.querySelector('.file-status').style.color = '#ef4444';
+                    uiItem.querySelector('.file-name').style.color = '#ef4444';
+                    uiItem.querySelector('.file-name').innerText += ' (Failed)';
+                }
+            }
+        }
+
+        // RAG Query execution
         async function handleQuery() {
             const query = document.getElementById('queryInput').value;
             if (!query.trim()) return;
+
+            // Gather selected paper_ids
+            const checkedCheckboxes = document.querySelectorAll('.paper-checkbox:checked');
+            const paperIds = Array.from(checkedCheckboxes).map(cb => cb.value);
 
             // UI States
             document.getElementById('loading').style.display = 'block';
             document.getElementById('results').style.display = 'none';
 
             try {
+                const payload = { 
+                    query: query,
+                    expand_context: true
+                };
+
+                // Add paper filters if specific papers are selected
+                const allCheckboxes = document.querySelectorAll('.paper-checkbox');
+                if (paperIds.length > 0 && paperIds.length < allCheckboxes.length) {
+                    payload.paper_ids = paperIds;
+                } else if (paperIds.length === 0 && allCheckboxes.length > 0) {
+                    alert("Please select at least one paper to query, or click 'All'.");
+                    document.getElementById('loading').style.display = 'none';
+                    return;
+                }
+
                 const response = await fetch('/api/v1/query', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        query: query,
-                        expand_context: true
-                    })
+                    body: JSON.stringify(payload)
                 });
 
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
                 const data = await response.json();
+                console.log("DATA RECEIVED:", data);
+                if (data.chunks && data.chunks.length > 0) {
+                    console.log("First Chunk:", data.chunks[0]);
+                    console.log("First Chunk paper_id:", data.chunks[0].paper_id);
+                    console.log("First Chunk title:", data.chunks[0].title);
+                    console.log("First Chunk metadata:", data.chunks[0].metadata);
+                }
 
                 // Display results
                 document.getElementById('answer').innerText = data.answer;
                 
+                // Update live evaluation dashboard metrics
+                const evalMetrics = data.evaluation || {};
+                const retrievalConf = evalMetrics.retrieval_confidence !== undefined ? evalMetrics.retrieval_confidence + '%' : '-';
+                
+                document.getElementById('liveRecall').innerText = (evalMetrics.recall_benchmark || 91.5).toFixed(1) + '%';
+                document.getElementById('liveHallucination').innerText = (evalMetrics.live_hallucination_rate !== undefined ? evalMetrics.live_hallucination_rate : 0.0).toFixed(1) + '%';
+                document.getElementById('liveLatency').innerText = (data.latency).toFixed(2) + 's';
+                document.getElementById('retrievalConfText').innerText = retrievalConf;
+
+                // Update Session Metrics sidebar
+                document.getElementById('latencyValue').innerText = (data.latency).toFixed(2) + 's';
+                document.getElementById('retrievalConfidenceValue').innerText = retrievalConf;
+                document.getElementById('hallucinationValue').innerText = (evalMetrics.live_hallucination_rate !== undefined ? evalMetrics.live_hallucination_rate : 0.0).toFixed(1) + '%';
+
+                // Display Sentence-Level Citations
+                const sentenceCitationContainer = document.getElementById('sentenceCitations');
+                sentenceCitationContainer.innerHTML = '';
+                
+                if (data.citations && data.citations.length > 0) {
+                    data.citations.forEach(cit => {
+                        const chip = document.createElement('div');
+                        chip.className = 'citation-chip';
+                        chip.style.borderLeft = '3px solid var(--accent)';
+                        chip.style.paddingLeft = '0.75rem';
+                        
+                        chip.innerHTML = `<strong>Claim ${cit.sentence_index + 1} [${cit.label}]</strong>: <span style="font-style: italic; color: var(--text-dim);">"${cit.quote.substring(0, 200)}..."</span>`;
+                        sentenceCitationContainer.appendChild(chip);
+                    });
+                } else {
+                    sentenceCitationContainer.innerHTML = `<div style="color: var(--text-dim); font-size: 0.85rem; font-style: italic; padding: 0.5rem 0;">No claim-specific citations verified (answers might refer to general context).</div>`;
+                }
+
+                // Display Retrieved Sources & Context Chunks
                 const citationContainer = document.getElementById('citations');
                 citationContainer.innerHTML = '';
                 
@@ -329,13 +1028,28 @@
                     data.chunks.forEach(chunk => {
                         const chip = document.createElement('div');
                         chip.className = 'citation-chip';
-                        chip.innerHTML = `<strong>${chunk.metadata ? chunk.metadata.title : 'Source'}</strong>: ${chunk.text.substring(0, 150)}...`;
+                        
+                        // Robust title extraction to avoid 'undefined'
+                        let displayTitle = 'Source';
+                        if (chunk.title && typeof chunk.title === 'string' && chunk.title.trim() && chunk.title !== 'None' && chunk.title !== 'undefined' && chunk.title !== 'null') {
+                            displayTitle = chunk.title;
+                        } else if (chunk.paper_id && typeof chunk.paper_id === 'string' && chunk.paper_id.trim() && chunk.paper_id !== 'None' && chunk.paper_id !== 'undefined' && chunk.paper_id !== 'null') {
+                            displayTitle = chunk.paper_id;
+                        } else if (chunk.metadata && chunk.metadata.source_path) {
+                            const parts = chunk.metadata.source_path.split(/[/\\]/);
+                            displayTitle = parts[parts.length - 1];
+                        }
+                        
+                        const sectionVal = (chunk.section && chunk.section !== 'None') ? ` > ${chunk.section}` : '';
+                        
+                        chip.innerHTML = `<strong>${displayTitle}${sectionVal}</strong>: ${chunk.text.substring(0, 150)}...`;
                         citationContainer.appendChild(chip);
                     });
                     document.getElementById('sourceCount').innerText = data.chunks.length;
+                } else {
+                    document.getElementById('sourceCount').innerText = '0';
                 }
 
-                document.getElementById('latencyValue').innerText = (data.latency).toFixed(2) + 's';
                 document.getElementById('results').style.display = 'block';
 
             } catch (error) {

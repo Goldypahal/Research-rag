@@ -58,10 +58,16 @@ class QueryService:
                     caption=caption
                 )
                 
+                fig_title = "Figure"
+                if best_fig.title and best_fig.title.strip().lower() not in {"none", "undefined", "null"}:
+                    fig_title = best_fig.title[:20]
+                elif best_fig.paper_id and best_fig.paper_id.strip().lower() not in {"none", "undefined", "null"}:
+                    fig_title = best_fig.paper_id
+
                 return {
                     "answer": fig_analysis,
                     "chunks": [best_fig.model_dump()],
-                    "citations": [{"label": best_fig.title or "Figure", "quote": caption or "Visual content", "page": best_fig.page_start}],
+                    "citations": [{"label": f"{fig_title} | Section: {best_fig.section or 'Visual'} | p.{best_fig.page_start or '?'}", "quote": caption or "Visual content", "page": best_fig.page_start}],
                     "latency": time.time() - start_time,
                     "is_multimodal": True
                 }

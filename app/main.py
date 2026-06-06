@@ -5,12 +5,15 @@ from .api import routes_ingest, routes_query, routes_eval, routes_feedback
 import uvicorn
 
 from .core.init_system import ensure_directories
+from .core.connectivity import mode_manager
 
 app = FastAPI(title="Research RAG Pipeline")
 
 @app.on_event("startup")
 async def startup_event():
     ensure_directories()
+    # Detect internet and set initial mode (local if offline, user-pref if online)
+    mode_manager.detect_and_set()
 
 app.include_router(routes_ingest.router, prefix="/api/v1")
 app.include_router(routes_query.router, prefix="/api/v1")

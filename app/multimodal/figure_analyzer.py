@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 class FigureAnalyzer:
     def __init__(self, api_key: str):
         genai.configure(api_key=api_key)
-        self.model = genai.GenerativeModel("gemini-1.5-flash")
+        self.model = genai.GenerativeModel("gemini-2.5-flash")
 
     def _prepare_image(self, image_path: str) -> dict:
         with open(image_path, "rb") as f:

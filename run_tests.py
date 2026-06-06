@@ -8,7 +8,7 @@ def main():
     sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), ".")))
     
     print("="*60)
-    print("🚀 Starting Research RAG Test Suite")
+    print("STARTING RESEARCH RAG TEST SUITE")
     print("="*60)
     
     # Run pytest with coverage and verbose output
@@ -22,11 +22,11 @@ def main():
     
     if exit_code == 0:
         print("\n" + "="*60)
-        print("✅ ALL TESTS PASSED!")
+        print("ALL TESTS PASSED!")
         print("="*60)
     else:
         print("\n" + "="*60)
-        print(f"❌ SOME TESTS FAILED (Exit code: {exit_code})")
+        print(f"SOME TESTS FAILED (Exit code: {exit_code})")
         print("="*60)
         
     sys.exit(exit_code)

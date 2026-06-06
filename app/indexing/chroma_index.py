@@ -45,8 +45,19 @@ class ChromaIndex:
 
     @retry_api_call(max_attempts=5, min_wait=1, max_wait=10)
     def query(self, query: str, k: int = 20, filters: Optional[dict] = None):
+        chroma_filter = None
+        if filters:
+            chroma_filter = {}
+            for key, val in filters.items():
+                if isinstance(val, list):
+                    if len(val) == 1:
+                        chroma_filter[key] = val[0]
+                    else:
+                        chroma_filter[key] = {"$in": val}
+                else:
+                    chroma_filter[key] = val
         try:
-            return self.vector_store.similarity_search_with_score(query, k=k, filter=filters)
+            return self.vector_store.similarity_search_with_score(query, k=k, filter=chroma_filter)
         except Exception as exc:
             msg = str(exc).lower()
             if "timeout" in msg:

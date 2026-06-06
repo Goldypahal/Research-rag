@@ -44,3 +44,11 @@ async def ingest_batch_papers(files: List[UploadFile] = File(...), parser_name: 
         paper = await _process_single_file(file, parser_name)
         results.append(paper)
     return results
+
+@router.get("/papers", response_model=List[str])
+async def list_papers():
+    raw_dir = "data/raw_papers"
+    if not os.path.exists(raw_dir):
+        return []
+    return [f.replace(".pdf", "") for f in os.listdir(raw_dir) if f.endswith(".pdf")]
+

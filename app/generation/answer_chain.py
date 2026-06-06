@@ -17,11 +17,28 @@ logger = logging.getLogger(__name__)
 
 class AnswerChain:
     def __init__(self):
-        self.llm = ChatOllama(
-            model=settings.OLLAMA_MODEL,
-            base_url=settings.OLLAMA_BASE_URL,
-            temperature=0
-        )
+        if settings.USE_LOCAL_LLM:
+            logger.info(f"Initializing AnswerChain using local ChatOllama ({settings.OLLAMA_MODEL}) as configured...")
+            self.llm = ChatOllama(
+                model=settings.OLLAMA_MODEL,
+                base_url=settings.OLLAMA_BASE_URL,
+                temperature=0
+            )
+        elif settings.GOOGLE_API_KEY:
+            logger.info("Initializing AnswerChain using ChatGoogleGenerativeAI (gemini-2.5-flash)...")
+            from langchain_google_genai import ChatGoogleGenerativeAI
+            self.llm = ChatGoogleGenerativeAI(
+                model="gemini-2.5-flash",
+                google_api_key=settings.GOOGLE_API_KEY,
+                temperature=0
+            )
+        else:
+            logger.info(f"Initializing AnswerChain using fallback ChatOllama ({settings.OLLAMA_MODEL})...")
+            self.llm = ChatOllama(
+                model=settings.OLLAMA_MODEL,
+                base_url=settings.OLLAMA_BASE_URL,
+                temperature=0
+            )
         self.prompt_loader = PromptLoader()
 
     def _get_chain(self, version: str = "v1"):
@@ -45,7 +62,8 @@ class AnswerChain:
 
     def generate(self, query: str, chunks: List[Chunk], prompt_version: str = "v1") -> str:
         import time
-        logger.info(f"Generating answer using model {settings.OLLAMA_MODEL} and prompt {prompt_version}...")
+        model_name = settings.OLLAMA_MODEL if settings.USE_LOCAL_LLM or not settings.GOOGLE_API_KEY else "gemini-2.5-flash"
+        logger.info(f"Generating answer using model {model_name} and prompt {prompt_version}...")
         context_text = "\n\n".join([f"Source {i}: {c.text}" for i, c in enumerate(chunks)])
         
         start_time = time.time()

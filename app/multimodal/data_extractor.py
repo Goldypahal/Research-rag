@@ -10,7 +10,7 @@ class DataExtractor:
         key = api_key or settings.GOOGLE_API_KEY
         if key:
             genai.configure(api_key=key)
-            self.model = genai.GenerativeModel("gemini-1.5-flash")
+            self.model = genai.GenerativeModel("gemini-2.5-flash")
         else:
             self.model = None
 

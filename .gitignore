@@ -46,3 +46,18 @@ data/golden_eval/
 # OS
 .DS_Store
 Thumbs.db
+
+# Scratch and test helper scripts
+check_all_chunks_keys.py
+inspect_pkl.py
+list_chroma_metadata.py
+print_raw_response.py
+quick_serialize.py
+search_dom_snapshots.py
+server_log.txt
+test_all_chunks.py
+test_api.py
+test_query_client.py
+test_query_keys.py
+view_last_logs.py
+

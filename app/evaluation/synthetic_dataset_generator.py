@@ -10,14 +10,14 @@ logger = logging.getLogger(__name__)
 class SyntheticDatasetGenerator:
     def __init__(self, api_key: str):
         genai.configure(api_key=api_key)
-        self.model = genai.GenerativeModel("gemini-1.5-flash")
+        self.model = genai.GenerativeModel("gemini-2.5-flash")
         self.api_key = api_key
 
     def _call_llm(self, prompt: str) -> str:
         """Isolated LLM call for easier mocking in tests."""
-        # Gemini 1.5 Flash supports system instructions and simplified JSON response
+        # Gemini 2.5 Flash supports system instructions and simplified JSON response
         model = genai.GenerativeModel(
-            model_name="gemini-1.5-flash",
+            model_name="gemini-2.5-flash",
             generation_config={"response_mime_type": "application/json"}
         )
         response = model.generate_content(prompt)
