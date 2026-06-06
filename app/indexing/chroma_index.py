@@ -14,18 +14,33 @@ class ChromaIndex:
         self._local_vector_store = None
         self._cloud_vector_store = None
 
+    def _make_cloud_embeddings(self):
+        """Build Google GenAI embeddings (langchain-google-genai >= 4.x)."""
+        from langchain_google_genai import GoogleGenerativeAIEmbeddings
+        # langchain-google-genai 4.x uses google-genai SDK (v1 endpoint).
+        # Model name must NOT have 'models/' prefix in the new SDK.
+        return GoogleGenerativeAIEmbeddings(
+            model="text-embedding-004",
+            google_api_key=settings.GOOGLE_API_KEY,
+            task_type="RETRIEVAL_DOCUMENT",
+        )
+
+    def _make_local_embeddings(self):
+        """Build Ollama embeddings for local mode."""
+        from langchain_ollama import OllamaEmbeddings
+        return OllamaEmbeddings(
+            model=settings.OLLAMA_EMBED_MODEL,
+            base_url=settings.OLLAMA_BASE_URL
+        )
+
     @property
     def vector_store(self):
         from langchain_chroma import Chroma
-        
+
         # Switch vector store & embedding model dynamically
         if mode_manager.mode == LLMMode.CLOUD and settings.GOOGLE_API_KEY:
             if self._cloud_vector_store is None:
-                from langchain_google_genai import GoogleGenerativeAIEmbeddings
-                embeddings = GoogleGenerativeAIEmbeddings(
-                    model="models/text-embedding-004",
-                    google_api_key=settings.GOOGLE_API_KEY
-                )
+                embeddings = self._make_cloud_embeddings()
                 self._cloud_vector_store = Chroma(
                     persist_directory=settings.CHROMA_DB_PATH + "_cloud",
                     embedding_function=embeddings,
@@ -34,11 +49,7 @@ class ChromaIndex:
             return self._cloud_vector_store
         else:
             if self._local_vector_store is None:
-                from langchain_ollama import OllamaEmbeddings
-                embeddings = OllamaEmbeddings(
-                    model=settings.OLLAMA_EMBED_MODEL,
-                    base_url=settings.OLLAMA_BASE_URL
-                )
+                embeddings = self._make_local_embeddings()
                 self._local_vector_store = Chroma(
                     persist_directory=settings.CHROMA_DB_PATH,
                     embedding_function=embeddings,

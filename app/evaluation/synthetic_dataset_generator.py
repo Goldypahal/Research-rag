@@ -1,4 +1,3 @@
-import google.generativeai as genai
 import json
 import logging
 from pathlib import Path
@@ -9,18 +8,27 @@ logger = logging.getLogger(__name__)
 
 class SyntheticDatasetGenerator:
     def __init__(self, api_key: str):
-        genai.configure(api_key=api_key)
-        self.model = genai.GenerativeModel("gemini-2.5-flash")
         self.api_key = api_key
+        self._client = None
+
+    def _get_client(self):
+        """Lazy-load google-genai client (new SDK)."""
+        if self._client is None:
+            import google.genai as genai
+            self._client = genai.Client(api_key=self.api_key)
+        return self._client
 
     def _call_llm(self, prompt: str) -> str:
         """Isolated LLM call for easier mocking in tests."""
-        # Gemini 2.5 Flash supports system instructions and simplified JSON response
-        model = genai.GenerativeModel(
-            model_name="gemini-2.5-flash",
-            generation_config={"response_mime_type": "application/json"}
+        from google.genai import types
+        client = self._get_client()
+        response = client.models.generate_content(
+            model="gemini-2.0-flash",
+            contents=prompt,
+            config=types.GenerateContentConfig(
+                response_mime_type="application/json"
+            ),
         )
-        response = model.generate_content(prompt)
         return response.text
 
     @retry_api_call(max_attempts=3, min_wait=2, max_wait=15)
@@ -38,17 +46,16 @@ Rules:
 - Output ONLY a valid JSON list of objects with "question" and "answer" keys.
 
 Text:
-{paper_text[:8000]} # Truncate to avoid context window issues
+{paper_text[:8000]}
 """
         try:
             content = self._call_llm(prompt)
             data = json.loads(content)
-            # Handle variations in output format
             if isinstance(data, dict):
                 for v in data.values():
                     if isinstance(v, list): return v
             return data if isinstance(data, list) else []
-            
+
         except Exception as exc:
             msg = str(exc).lower()
             if "timeout" in msg:
