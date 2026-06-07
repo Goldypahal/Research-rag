@@ -29,3 +29,10 @@ class Settings(BaseSettings):
 
 settings = Settings()
 
+# Automatically force Cloud Mode when running on Render to prevent OOM and local Ollama errors
+import os
+if os.environ.get("RENDER") == "true" or os.environ.get("RENDER"):
+    settings.USE_LOCAL_LLM = False
+    settings.USE_LOCAL_RERANKER = False
+
+
