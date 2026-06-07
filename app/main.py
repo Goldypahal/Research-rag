@@ -1,3 +1,13 @@
+import os
+import gc
+
+# Restrict multithreading to minimize memory footprint on resource-constrained containers (like Render)
+os.environ["OMP_NUM_THREADS"] = "1"
+os.environ["MKL_NUM_THREADS"] = "1"
+os.environ["OPENBLAS_NUM_THREADS"] = "1"
+os.environ["VECLIB_MAXIMUM_THREADS"] = "1"
+os.environ["NUMEXPR_NUM_THREADS"] = "1"
+
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
@@ -25,6 +35,9 @@ async def startup_event():
         args=(chroma, bm25),
         daemon=True
     ).start()
+    
+    # Run garbage collection to free import-time memory
+    gc.collect()
 
 app.include_router(routes_ingest.router, prefix="/api/v1")
 app.include_router(routes_query.router, prefix="/api/v1")
