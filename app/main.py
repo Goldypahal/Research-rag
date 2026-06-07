@@ -14,6 +14,17 @@ async def startup_event():
     ensure_directories()
     # Detect internet and set initial mode (local if offline, user-pref if online)
     mode_manager.detect_and_set()
+    
+    # Run auto-ingest in a background thread to prevent startup block
+    import threading
+    from .api.routes_query import chroma, bm25
+    from .core.auto_ingest import run_auto_ingest_background
+    
+    threading.Thread(
+        target=run_auto_ingest_background,
+        args=(chroma, bm25),
+        daemon=True
+    ).start()
 
 app.include_router(routes_ingest.router, prefix="/api/v1")
 app.include_router(routes_query.router, prefix="/api/v1")

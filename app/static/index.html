@@ -764,15 +764,19 @@
                 }
 
                 // Preserve checked states if possible
+                const existingPaperIds = new Set(
+                    Array.from(document.querySelectorAll('.paper-checkbox')).map(cb => cb.value)
+                );
                 const checkedPaperIds = new Set(
                     Array.from(document.querySelectorAll('.paper-checkbox:checked')).map(cb => cb.value)
                 );
                 
                 // If it was empty or first load, select all by default
-                const isFirstLoad = document.querySelectorAll('.paper-checkbox').length === 0;
+                const isFirstLoad = existingPaperIds.size === 0;
 
                 fileList.innerHTML = papers.map(paperId => {
-                    const isChecked = isFirstLoad || checkedPaperIds.has(paperId);
+                    // Check if it was checked before, OR if it is a new paper not previously listed, OR if it's first load
+                    const isChecked = isFirstLoad || checkedPaperIds.has(paperId) || !existingPaperIds.has(paperId);
                     return `
                         <div class="file-item">
                             <div style="display: flex; align-items: center; gap: 0.5rem; overflow: hidden;">
