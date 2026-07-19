@@ -11,7 +11,7 @@ os.environ["NUMEXPR_NUM_THREADS"] = "1"
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
-from .api import routes_ingest, routes_query, routes_eval, routes_feedback
+from .api import routes_ingest, routes_query, routes_eval, routes_feedback, routes_intel
 import uvicorn
 
 from .core.init_system import ensure_directories
@@ -43,6 +43,7 @@ app.include_router(routes_ingest.router, prefix="/api/v1")
 app.include_router(routes_query.router, prefix="/api/v1")
 app.include_router(routes_eval.router, prefix="/api/v1")
 app.include_router(routes_feedback.router, prefix="/api/v1")
+app.include_router(routes_intel.router, prefix="/api/v1/intel")
 
 # Serve UI
 app.mount("/static", StaticFiles(directory="app/static"), name="static")

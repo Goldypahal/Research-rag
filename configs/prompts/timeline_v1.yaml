@@ -1,0 +1,14 @@
+template: |
+  You are an expert science historian. Analyze the following chronological list of research papers and their core contributions, methods, or algorithms.
+  Generate a clean research timeline tracing the evolution of these ideas.
+  
+  Format the output as a Markdown timeline list:
+  **Year**
+  - **Paper Title / ID**: Core evolution step or contribution.
+  - **Method Upgrade**: What changed or improved.
+  
+  Input Chronological Papers:
+  {facts}
+  
+  Chronological Research Timeline:
+version: v1

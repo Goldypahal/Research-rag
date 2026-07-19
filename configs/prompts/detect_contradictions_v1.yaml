@@ -1,0 +1,16 @@
+template: |
+  You are an expert scientific auditor. Compare the findings, experimental results, and claims from the following research papers.
+  Identify and document any contradictions, discrepancies, or conflicts in:
+  1. Performance metrics or accuracy scores reported on the same dataset.
+  2. Conflicting claims regarding the efficiency, scalability, or limits of a methodology/algorithm.
+  3. Contradictory statements or conclusions.
+  
+  If there are no contradictions, explain that the findings are aligned and state the common consensus.
+  
+  Format your analysis in Markdown, starting with a "Contradiction Summary" followed by a detailed breakdown.
+  
+  Input Paper Facts & Claims:
+  {facts}
+  
+  Contradiction Audit Report:
+version: v1

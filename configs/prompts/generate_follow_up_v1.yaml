@@ -1,0 +1,13 @@
+template: |
+  You are an expert search planner. Analyze the user's research question and the retrieved text context to decide if we need to run a secondary search to retrieve more information about a referenced paper, dataset, algorithm, or method.
+  
+  If the retrieved context mentions a dataset, algorithm, or reference that is critical to answering the question but is not explained in the text, generate a single focused search query for that item.
+  Otherwise, if the retrieved context is already sufficient to answer the question, or if no secondary search is needed, output STRICTLY the word "NONE".
+  
+  User Question: {question}
+  
+  Retrieved Context:
+  {context}
+  
+  Output:
+version: v1

@@ -24,12 +24,23 @@ class ChromaIndex:
         )
 
     def _make_local_embeddings(self):
-        """Build Ollama embeddings for local mode."""
-        from langchain_ollama import OllamaEmbeddings
-        return OllamaEmbeddings(
-            model=settings.OLLAMA_EMBED_MODEL,
-            base_url=settings.OLLAMA_BASE_URL
-        )
+        """Build local HuggingFace/SentenceTransformers embeddings using BAAI/bge-m3."""
+        import logging
+        logger = logging.getLogger(__name__)
+        try:
+            from langchain_community.embeddings import HuggingFaceEmbeddings
+            logger.info("Initializing local HuggingFaceEmbeddings with BAAI/bge-m3...")
+            return HuggingFaceEmbeddings(
+                model_name="BAAI/bge-m3",
+                model_kwargs={'device': 'cpu'}
+            )
+        except Exception as e:
+            logger.warning(f"Failed to load local BAAI/bge-m3 embeddings: {e}. Falling back to Ollama nomic-embed-text.")
+            from langchain_ollama import OllamaEmbeddings
+            return OllamaEmbeddings(
+                model=settings.OLLAMA_EMBED_MODEL,
+                base_url=settings.OLLAMA_BASE_URL
+            )
 
     @property
     def vector_store(self):

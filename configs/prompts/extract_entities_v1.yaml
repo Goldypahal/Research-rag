@@ -1,0 +1,46 @@
+template: |
+  You are an expert scientific researcher. Analyze the following academic text and extract key entities and their relationships.
+  
+  We want to extract entities of the following types:
+  - "Author": The name of researchers/authors.
+  - "Method": Techniques, architectures, neural network architectures, or experimental setups.
+  - "Dataset": Databases, benchmark datasets, corpuses, or evaluation sets.
+  - "Algorithm": Specific algorithms, mathematical optimization routines, or optimization parameters.
+  - "Equation": Specific formulas, loss functions, or mathematical definitions.
+  - "Result": Experimental findings, metrics (e.g. "Accuracy 95%"), or ablation outcomes.
+  - "Paper": The title or ID of research papers.
+  
+  And relationships of the following types:
+  - "wrote": [Author] wrote [Paper]
+  - "evaluated_on": [Method] evaluated_on [Dataset]
+  - "outperforms": [Method/Algorithm] outperforms [Method/Algorithm]
+  - "uses": [Method] uses [Algorithm/Equation/Dataset/Method]
+  - "cites": [Paper] cites [Paper]
+  - "contains": [Paper] contains [Method/Equation/Result]
+  - "defines": [Method/Paper] defines [Equation/Algorithm]
+  
+  Text:
+  {text}
+  
+  Format your output STRICTLY as a JSON object with two lists: "entities" and "relationships".
+  Do not include markdown tags, backticks, or any conversational text.
+  
+  JSON format:
+  {{
+    "entities": [
+      {{"name": "Entity Name", "type": "Entity Type (e.g. Method, Dataset, Algorithm)"}}
+    ],
+    "relationships": [
+      {{
+        "source_name": "Source Entity Name",
+        "source_type": "Source Entity Type",
+        "relation_type": "Relation Type (e.g. evaluated_on, uses, outperforms)",
+        "target_name": "Target Entity Name",
+        "target_type": "Target Entity Type",
+        "description": "Short 1-sentence sentence/clause from text supporting this relationship"
+      }}
+    ]
+  }}
+  
+  Output:
+version: v1

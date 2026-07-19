@@ -43,8 +43,7 @@ class FigureAnalyzer:
             image_data = self._prepare_image(image_path)
 
             prompt = f"""
-You are a scientific research assistant.
-A user asked a question about a figure in a research paper.
+You are an expert scientific researcher. A user is asking a question about a visual element (figure, chart, plot, diagram, or table) extracted from an academic paper.
 
 Figure caption:
 {caption or "No caption provided."}
@@ -52,8 +51,11 @@ Figure caption:
 User question:
 {question}
 
-Explain what the chart or table shows.
-Focus on trends, patterns, comparisons, and conclusions.
+Based on the image provided:
+1. **Explanation**: Describe the key trends, patterns, comparisons, and conclusions shown in the visual.
+2. **Chart Digitization**: If this is a chart, plot, or graph (e.g. line chart, bar plot, scatter plot), extract and digitize the approximate data values from the axes and represent them in a structured Markdown table or CSV format.
+3. **Table Reasoning**: If this is a table, represent its rows and columns clearly and perform any reasoning/queries requested by the user.
+4. **Equation Extraction**: If there are mathematical formulas visible, format them in clean LaTeX notation.
 """
 
             return self._call_vision_model(prompt, image_data)

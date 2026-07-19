@@ -1,0 +1,13 @@
+template: |
+  You are an expert scientific analyst. Given the following facts and summaries extracted from multiple research papers, generate a structured markdown comparison table.
+  
+  The table must contain these exact columns:
+  | Paper | Method/Model | Dataset | Accuracy/Metrics | Key Limitation |
+  
+  Format the table cleanly in Markdown. Below the table, provide a short 2-sentence summary comparing the papers.
+  
+  Input Paper Facts:
+  {facts}
+  
+  Output:
+version: v1

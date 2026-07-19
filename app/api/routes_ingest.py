@@ -31,6 +31,15 @@ async def _process_single_file(file: UploadFile, parser_name: str) -> Paper:
     chroma.add_chunks(chunks)
     bm25.add_chunks(chunks)
     
+    # 5. Extract & Index Entities for Graph RAG
+    try:
+        from ..indexing.entity_extractor import EntityExtractor
+        extractor = EntityExtractor()
+        extractor.extract_and_index_paper(paper)
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).error(f"Failed to extract entities during ingestion: {e}")
+        
     return paper
 
 @router.post("/ingest", response_model=Paper)

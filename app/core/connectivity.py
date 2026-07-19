@@ -35,8 +35,8 @@ def check_internet(host: str = "8.8.8.8", port: int = 53, timeout: float = 2.0) 
 class ModeManager:
     """
     Singleton that holds the current LLM mode at runtime.
-    Initialized on startup based on connectivity; can be changed
-    at any time via the /api/v1/mode endpoint.
+    Initialized on startup based on connectivity and key availability;
+    automatically falls back to local.
     """
     _instance: "ModeManager | None" = None
 
@@ -54,21 +54,22 @@ class ModeManager:
         """
         from .settings import settings
         self._internet_available = check_internet()
+        has_keys = bool(settings.GOOGLE_API_KEY and settings.COHERE_API_KEY)
 
-        if not self._internet_available:
-            self._mode = LLMMode.LOCAL
-            logger.info("Connectivity: No internet detected. Forced to LOCAL mode.")
-        elif settings.USE_LOCAL_LLM:
-            # Internet is available but user's default preference is local
-            self._mode = LLMMode.LOCAL
-            logger.info("Connectivity: Internet available. Starting in LOCAL mode (user default).")
-        else:
+        if self._internet_available and has_keys:
             self._mode = LLMMode.CLOUD
-            logger.info("Connectivity: Internet available. Starting in CLOUD mode.")
+            logger.info("Connectivity: Internet detected and Cloud API keys found. Configured to CLOUD mode.")
+        else:
+            self._mode = LLMMode.LOCAL
+            logger.info(f"Connectivity: Configured to LOCAL mode. (Internet: {self._internet_available}, Keys present: {has_keys})")
 
     @property
     def mode(self) -> LLMMode:
-        return self._mode
+        from .settings import settings
+        has_keys = bool(settings.GOOGLE_API_KEY and settings.COHERE_API_KEY)
+        if self._internet_available and has_keys:
+            return LLMMode.CLOUD
+        return LLMMode.LOCAL
 
     @property
     def internet_available(self) -> bool:
@@ -76,21 +77,14 @@ class ModeManager:
 
     def set_mode(self, mode: LLMMode) -> bool:
         """
-        Switch mode. Returns False if cloud was requested but no internet.
+        Mode is managed automatically. Manual override prints a warning but returns True.
         """
-        if mode == LLMMode.CLOUD and not self._internet_available:
-            logger.warning("Cannot switch to CLOUD: no internet connection.")
-            return False
-        self._mode = mode
-        logger.info(f"Mode switched to: {mode.value.upper()}")
+        logger.info("set_mode: Mode changes are managed automatically based on connectivity and configured API keys.")
         return True
 
     def refresh_connectivity(self) -> bool:
         """Re-check internet connectivity on demand."""
         self._internet_available = check_internet()
-        if not self._internet_available and self._mode == LLMMode.CLOUD:
-            logger.warning("Internet lost! Auto-switching back to LOCAL mode.")
-            self._mode = LLMMode.LOCAL
         return self._internet_available
 
 

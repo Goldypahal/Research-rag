@@ -58,6 +58,14 @@ def run_auto_ingest_background(chroma: ChromaIndex, bm25: BM25Index):
             chroma.add_chunks(chunks)
             all_new_chunks.extend(chunks)
             logger.info(f"Successfully auto-ingested {filename} ({len(chunks)} chunks)")
+            
+            # Extract & Index Entities for Graph RAG
+            try:
+                from ..indexing.entity_extractor import EntityExtractor
+                extractor = EntityExtractor()
+                extractor.extract_and_index_paper(paper)
+            except Exception as e:
+                logger.error(f"Failed to extract entities during auto-ingestion: {e}")
         except Exception as e:
             logger.error(f"Failed to auto-ingest {filename}: {e}", exc_info=True)
 

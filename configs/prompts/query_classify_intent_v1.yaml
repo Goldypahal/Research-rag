@@ -1,0 +1,31 @@
+template: |
+  You are an expert scientific search planner. Analyze the user's research query and classify its primary intent into exactly one of the following 10 categories:
+  - "definition": Factual definition queries, explanation of single terms, or parameter values.
+  - "comparison": A request comparing multiple models, papers, methods, or parameters.
+  - "summarization": A request to summarize a paper, section, abstract, or finding.
+  - "methodology": Explanations of experimental setups, neural architectures, training protocols, or techniques.
+  - "dataset": Questions about datasets used, benchmarks, curation processes, or dataset sizes.
+  - "equation": Requests explaining mathematical equations, formulas, loss functions, or derivations.
+  - "figure/table": Questions asking about diagrams, plots, tables, visual graphs, or captions.
+  - "literature review": Questions asking for a survey of literature on a topic, history, or related works.
+  - "research gap": Questions seeking missing links, future directions, under-explored combinations, or open research gaps.
+  - "multi-paper analysis": Questions analyzing or synthesizing findings across multiple different papers.
+  
+  Format your output STRICTLY as a single word/phrase containing the category name ("definition", "comparison", "summarization", "methodology", "dataset", "equation", "figure/table", "literature review", "research gap", or "multi-paper analysis"). Do not include any punctuation, markdown, backticks, or explanation.
+  
+  Examples:
+  Query: "What is AdamW optimizer?"
+  Output: definition
+  
+  Query: "Compare the parameter size of ViT vs ResNet."
+  Output: comparison
+  
+  Query: "Explain how equation 4's loss function is derived."
+  Output: equation
+  
+  Query: "What dataset was used to benchmark the ViT model?"
+  Output: dataset
+  
+  Original Query: {query}
+  Output:
+version: v1

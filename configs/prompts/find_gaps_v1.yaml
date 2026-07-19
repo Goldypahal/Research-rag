@@ -1,0 +1,14 @@
+template: |
+  You are an expert academic research advisor. Analyze the following list of active methods, datasets, and research topics extracted from our paper corpus.
+  Your goal is to find "Research Gaps" (under-explored combinations, untested applications of a method to a dataset, or potential future work directions).
+  
+  Structure your analysis in Markdown with:
+  1. Frequently Studied Areas (the common combinations)
+  2. Under-Explored Combinations (combinations that are missing or only mentioned in passing)
+  3. Proposed Research Gaps (3 concrete suggestions for novel papers or setups)
+  
+  Corpus Facts:
+  {facts}
+  
+  Research Gap Analysis Report:
+version: v1

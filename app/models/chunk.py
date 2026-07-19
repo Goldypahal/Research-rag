@@ -25,6 +25,11 @@ class Chunk(BaseModel):
     page_end: Optional[int] = None
     chunk_type: str = "text"
     image_path: Optional[str] = None
+    
+    # Hierarchical fields
+    chunk_level: str = "paragraph"  # "section", "subsection", "paragraph", "sentence"
+    parent_id: Optional[str] = None
+    children_ids: List[str] = Field(default_factory=list)
 
     metadata: Dict[str, Any] = Field(default_factory=dict)
 
@@ -47,5 +52,8 @@ class Chunk(BaseModel):
             "page_end": self.page_end,
             "chunk_type": self.chunk_type,
             "image_path": self.image_path,
+            "chunk_level": self.chunk_level,
+            "parent_id": self.parent_id,
+            "children_ids": ",".join(self.children_ids) if self.children_ids else None,
             **self.metadata,
         }

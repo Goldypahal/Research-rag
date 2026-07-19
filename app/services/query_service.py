@@ -19,6 +19,12 @@ class QueryService:
         self.answer_chain = answer_chain
         self.citation_enforcer = citation_enforcer
         self.figure_analyzer = FigureAnalyzer(api_key=settings.GOOGLE_API_KEY) if settings.GOOGLE_API_KEY else None
+        
+        # Initialize query orchestration planner & multihop retrieval
+        from .agent_planner import AgentPlanner
+        from ..retrieval.multihop_retriever import MultiHopRetriever
+        self.planner = AgentPlanner()
+        self.multihop_retriever = MultiHopRetriever(self.retriever)
 
     def ask(
         self,
@@ -31,14 +37,17 @@ class QueryService:
     ) -> Dict[str, Any]:
         start_time = time.time()
         
-        # 1. Retrieve
+        # 1. Plan Route
+        route = self.planner.plan_route(query, prompt_version=prompt_version)
+        logger.info(f"AgentPlanner routed query to: '{route}'")
+        
+        # 2. Retrieve
         ret_start = time.time()
-        retrieval_res = self.retriever.retrieve(query=query, filters=filters)
-        top_chunks = retrieval_res["top_chunks"]
-        logger.info(f"Retrieval took {time.time() - ret_start:.2f}s")
         
         # Check if it's a figure-based question and we have relevant figures
-        if is_figure_question(query) and self.figure_analyzer:
+        if (route == "figure" or is_figure_question(query)) and self.figure_analyzer:
+            retrieval_res = self.retriever.retrieve(query=query, filters=filters)
+            top_chunks = retrieval_res["top_chunks"]
             figure_chunks = [c for c in top_chunks if c.image_path and os.path.exists(c.image_path)]
             if figure_chunks:
                 logger.info(f"Detected figure-related question. Analyzing: {figure_chunks[0].image_path}")
@@ -72,6 +81,15 @@ class QueryService:
                     "is_multimodal": True
                 }
 
+        # Otherwise, retrieve using standard hybrid or multi-hop
+        if route == "multihop":
+            retrieval_res = self.multihop_retriever.retrieve_multi_hop(query=query, filters=filters)
+        else:
+            retrieval_res = self.retriever.retrieve(query=query, filters=filters)
+            
+        top_chunks = retrieval_res["top_chunks"]
+        logger.info(f"Retrieval took {time.time() - ret_start:.2f}s")
+
         chunks = top_chunks
         if expand_context and chunks:
             from ..retrieval.hybrid_retriever import expand_parent_context
@@ -89,12 +107,12 @@ class QueryService:
                 "latency": time.time() - start_time
             }
 
-        # 2. Generate
+        # 3. Generate
         gen_start = time.time()
         raw_answer = self.answer_chain.generate(query=query, chunks=chunks, prompt_version=prompt_version)
         logger.info(f"Generation took {time.time() - gen_start:.2f}s")
         
-        # 3. Enforce Citations
+        # 4. Enforce Citations
         enf_start = time.time()
         verified = self.citation_enforcer.enforce(answer=raw_answer, chunks=chunks)
         logger.info(f"Citation enforcement took {time.time() - enf_start:.2f}s")
@@ -110,7 +128,7 @@ class QueryService:
             "is_multimodal": False
         }
 
-        # 4. Export if requested
+        # 5. Export if requested
         if export_markdown_path or export_docx_path:
             note = LiteratureNote(
                 title="Research Summary",
@@ -132,7 +150,7 @@ class QueryService:
             if export_docx_path:
                 LiteratureNotesExporter.save_docx(note, export_docx_path)
 
-        # 5. Persist Trace
+        # 6. Persist Trace
         self._log_trace(query, retrieval_res, chunks, verified, latency)
 
         return result
@@ -145,7 +163,9 @@ class QueryService:
             "final_chunks": [c.chunk_id for c in chunks],
             "answer": verified.get("answer", "n/a"),
             "latency": latency,
-            "timestamp": time.time()
+            "timestamp": time.time(),
+            "decomposed_queries": retrieval_res.get("decomposed_queries", [query]),
+            "query_intent": retrieval_res.get("query_intent", "unknown")
         }
         os.makedirs("data/traces", exist_ok=True)
         with open("data/traces/query_logs.jsonl", "a") as f:

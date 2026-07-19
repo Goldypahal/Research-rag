@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Research RAG | Intelligent Insights</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Outfit:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.26.0/cytoscape.min.js"></script>
     <style>
         :root {
             --primary: #6366f1;
@@ -416,6 +417,35 @@
             animation: rotation 0.8s linear infinite;
         }
 
+        /* Tab navigation */
+        .tabs-bar {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 0.25rem;
+        }
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-dim);
+            font-size: 0.95rem;
+            font-weight: 600;
+            padding: 0.5rem 1.25rem;
+            cursor: pointer;
+            border-radius: 0.75rem;
+            transition: all 0.2s ease;
+        }
+        .tab-btn:hover {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.03);
+        }
+        .tab-btn.active {
+            color: var(--accent);
+            background: rgba(34, 211, 238, 0.08);
+            box-shadow: inset 0 0 0 1px rgba(34, 211, 238, 0.2);
+        }
+
         /* Responsive */
         @media (max-width: 900px) {
             main {
@@ -432,64 +462,86 @@
 
     <main>
         <div class="chat-section">
-            <div class="glass-card">
-                <div class="input-group">
-                    <textarea id="queryInput" placeholder="Ask a question about your research papers..."></textarea>
-                </div>
-                <div class="controls">
-                    <div class="mode-panel">
-                        <!-- Connectivity badge -->
-                        <span id="connBadge" class="connectivity-badge local-only">
-                            <span class="conn-dot local" id="connDot"></span>
-                            <span id="connLabel">Checking...</span>
-                        </span>
+            <!-- Tabs Bar -->
+            <div class="tabs-bar">
+                <button class="tab-btn active" id="tabChat" onclick="switchTab('chat')">💬 Assistant</button>
+                <button class="tab-btn" id="tabGraph" onclick="switchTab('graph')">🕸️ Knowledge Graph</button>
+            </div>
+            
+            <!-- Chat Tab Content -->
+            <div id="chatTabContent">
+                <div class="glass-card">
+                    <div class="input-group">
+                        <textarea id="queryInput" placeholder="Ask a question about your research papers..."></textarea>
+                    </div>
+                    <div class="controls">
+                        <div class="mode-panel">
+                            <!-- Connectivity badge -->
+                            <span id="connBadge" class="connectivity-badge local-only">
+                                <span class="conn-dot local" id="connDot"></span>
+                                <span id="connLabel">Checking...</span>
+                            </span>
 
-                        <!-- Local / Cloud toggle (shown only when internet available) -->
-                        <div class="mode-toggle" id="modeToggle">
-                            <button class="mode-btn active-local" id="btnLocal" onclick="switchMode('local')">⚡ Local</button>
-                            <button class="mode-btn" id="btnCloud" onclick="switchMode('cloud')">☁ Cloud</button>
+                            <!-- Local / Cloud toggle (shown only when internet available) -->
+                            <div class="mode-toggle" id="modeToggle">
+                                <button class="mode-btn active-local" id="btnLocal" onclick="switchMode('local')">⚡ Local</button>
+                                <button class="mode-btn" id="btnCloud" onclick="switchMode('cloud')">☁ Cloud</button>
+                            </div>
+
+                            <span class="mode-switching" id="modeSwitching">Switching...</span>
                         </div>
-
-                        <span class="mode-switching" id="modeSwitching">Switching...</span>
-                    </div>
-                    <button class="btn-primary" onclick="handleQuery()">Ask Question</button>
-                </div>
-            </div>
-
-            <div id="loading">
-                <span class="loader"></span>
-                <p style="margin-top: 1rem; color: var(--text-dim)">Synthesizing knowledge...</p>
-            </div>
-
-            <div id="results" class="glass-card results-area" style="display: none;">
-                <!-- RAG Evaluation & Performance Dashboard -->
-                <h3 style="margin-bottom: 1rem; color: var(--accent); font-family: 'Outfit';">Evaluation & Performance Metrics</h3>
-                <div class="metrics-row" style="display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
-                    <div class="metric-box glass-card" style="flex: 1; min-width: 150px; padding: 0.75rem; text-align: center; border-radius: 0.75rem; border: 1px solid var(--glass-border); background: rgba(15, 23, 42, 0.4);">
-                        <div style="font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; margin-bottom: 0.25rem; font-weight: 600; letter-spacing: 0.05em;">Retrieval Recall</div>
-                        <div id="liveRecall" style="font-size: 1.5rem; font-weight: bold; color: var(--accent);">91.5%</div>
-                        <div style="font-size: 0.65rem; color: var(--text-dim); margin-top: 0.25rem;">Benchmark: 91.5% | Live Conf: <span id="retrievalConfText">-</span></div>
-                    </div>
-                    <div class="metric-box glass-card" style="flex: 1; min-width: 150px; padding: 0.75rem; text-align: center; border-radius: 0.75rem; border: 1px solid var(--glass-border); background: rgba(15, 23, 42, 0.4);">
-                        <div style="font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; margin-bottom: 0.25rem; font-weight: 600; letter-spacing: 0.05em;">Hallucination Rate</div>
-                        <div id="liveHallucination" style="font-size: 1.5rem; font-weight: bold; color: #10b981;">0.0%</div>
-                        <div style="font-size: 0.65rem; color: var(--text-dim); margin-top: 0.25rem;">Citation-Enforced Verification</div>
-                    </div>
-                    <div class="metric-box glass-card" style="flex: 1; min-width: 150px; padding: 0.75rem; text-align: center; border-radius: 0.75rem; border: 1px solid var(--glass-border); background: rgba(15, 23, 42, 0.4);">
-                        <div style="font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; margin-bottom: 0.25rem; font-weight: 600; letter-spacing: 0.05em;">Response Latency</div>
-                        <div id="liveLatency" style="font-size: 1.5rem; font-weight: bold; color: white;">-</div>
-                        <div style="font-size: 0.65rem; color: var(--text-dim); margin-top: 0.25rem;">Benchmark Avg: 2.84s</div>
+                        <button class="btn-primary" onclick="handleQuery()">Ask Question</button>
                     </div>
                 </div>
 
-                <h3 style="margin-bottom: 1.5rem; color: var(--accent); font-family: 'Outfit'; border-top: 1px solid var(--glass-border); padding-top: 1.5rem;">Synthesized Answer</h3>
-                <div id="answer" class="answer-box"></div>
-                
-                <h4 style="margin-top: 2rem; margin-bottom: 1rem; font-size: 0.9rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em;">Sentence-Level Citations</h4>
-                <div id="sentenceCitations" class="citations" style="margin-bottom: 1.5rem;"></div>
+                <div id="loading">
+                    <span class="loader"></span>
+                    <p style="margin-top: 1rem; color: var(--text-dim)">Synthesizing knowledge...</p>
+                </div>
 
-                <h4 style="margin-bottom: 1rem; font-size: 0.9rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em;">Retrieved Sources & Context Chunks</h4>
-                <div id="citations" class="citations"></div>
+                <div id="results" class="glass-card results-area" style="display: none;">
+                    <!-- RAG Evaluation & Performance Dashboard -->
+                    <h3 style="margin-bottom: 1rem; color: var(--accent); font-family: 'Outfit';">Evaluation & Performance Metrics</h3>
+                    <div class="metrics-row" style="display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+                        <div class="metric-box glass-card" style="flex: 1; min-width: 150px; padding: 0.75rem; text-align: center; border-radius: 0.75rem; border: 1px solid var(--glass-border); background: rgba(15, 23, 42, 0.4);">
+                            <div style="font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; margin-bottom: 0.25rem; font-weight: 600; letter-spacing: 0.05em;">Retrieval Recall</div>
+                            <div id="liveRecall" style="font-size: 1.5rem; font-weight: bold; color: var(--accent);">91.5%</div>
+                            <div style="font-size: 0.65rem; color: var(--text-dim); margin-top: 0.25rem;">Benchmark: 91.5% | Live Conf: <span id="retrievalConfText">-</span></div>
+                        </div>
+                        <div class="metric-box glass-card" style="flex: 1; min-width: 150px; padding: 0.75rem; text-align: center; border-radius: 0.75rem; border: 1px solid var(--glass-border); background: rgba(15, 23, 42, 0.4);">
+                            <div style="font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; margin-bottom: 0.25rem; font-weight: 600; letter-spacing: 0.05em;">Hallucination Rate</div>
+                            <div id="liveHallucination" style="font-size: 1.5rem; font-weight: bold; color: #10b981;">0.0%</div>
+                            <div style="font-size: 0.65rem; color: var(--text-dim); margin-top: 0.25rem;">Citation-Enforced Verification</div>
+                        </div>
+                        <div class="metric-box glass-card" style="flex: 1; min-width: 150px; padding: 0.75rem; text-align: center; border-radius: 0.75rem; border: 1px solid var(--glass-border); background: rgba(15, 23, 42, 0.4);">
+                            <div style="font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; margin-bottom: 0.25rem; font-weight: 600; letter-spacing: 0.05em;">Response Latency</div>
+                            <div id="liveLatency" style="font-size: 1.5rem; font-weight: bold; color: white;">-</div>
+                            <div style="font-size: 0.65rem; color: var(--text-dim); margin-top: 0.25rem;">Benchmark Avg: 2.84s</div>
+                        </div>
+                    </div>
+
+                    <h3 style="margin-bottom: 1.5rem; color: var(--accent); font-family: 'Outfit'; border-top: 1px solid var(--glass-border); padding-top: 1.5rem;">Synthesized Answer</h3>
+                    <div id="answer" class="answer-box"></div>
+                    
+                    <h4 style="margin-top: 2rem; margin-bottom: 1rem; font-size: 0.9rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em;">Sentence-Level Citations</h4>
+                    <div id="sentenceCitations" class="citations" style="margin-bottom: 1.5rem;"></div>
+
+                    <h4 style="margin-bottom: 1rem; font-size: 0.9rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em;">Retrieved Sources & Context Chunks</h4>
+                    <div id="citations" class="citations"></div>
+                </div>
+            </div>
+            
+            <!-- Graph Tab Content -->
+            <div id="graphTabContent" class="glass-card" style="display: none; height: 620px; position: relative; overflow: hidden; padding: 0; border-radius: 1.5rem; background: var(--card-bg); border: 1px solid var(--glass-border);">
+                <div style="padding: 1rem; border-bottom: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center; background: rgba(15, 23, 42, 0.4);">
+                    <h3 style="font-family: 'Outfit'; color: var(--accent); font-size: 1.1rem; margin: 0;">Interactive Research Graph</h3>
+                    <button class="btn-primary" onclick="reloadGraph()" style="padding: 0.4rem 1rem; font-size: 0.85rem;">Refresh Graph</button>
+                </div>
+                <div id="cy" style="width: 100%; height: calc(100% - 53px); background: rgba(15, 23, 42, 0.25);"></div>
+                <div id="cyInfo" style="position: absolute; bottom: 1rem; left: 1rem; max-width: 320px; background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); padding: 1rem; border-radius: 1rem; font-size: 0.85rem; display: none; z-index: 10; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+                    <h4 id="cyInfoTitle" style="color: var(--accent); margin-bottom: 0.5rem; font-family: 'Outfit'; font-size: 1rem;">Node</h4>
+                    <p id="cyInfoText" style="color: var(--text-dim); line-height: 1.5; font-size: 0.8rem;"></p>
+                </div>
             </div>
         </div>
 
@@ -579,6 +631,161 @@
         let _internetAvailable = false;
         let _currentMode = 'local'; // 'local' | 'cloud'
         let _hasCloudKeys = false;
+
+        // Tab Switching
+        function switchTab(tabName) {
+            const tabChat = document.getElementById('tabChat');
+            const tabGraph = document.getElementById('tabGraph');
+            const chatContent = document.getElementById('chatTabContent');
+            const graphContent = document.getElementById('graphTabContent');
+            
+            if (tabName === 'chat') {
+                tabChat.classList.add('active');
+                tabGraph.classList.remove('active');
+                chatContent.style.display = 'block';
+                graphContent.style.display = 'none';
+            } else {
+                tabGraph.classList.add('active');
+                tabChat.classList.remove('active');
+                chatContent.style.display = 'none';
+                graphContent.style.display = 'block';
+                // Trigger cytoscape load
+                reloadGraph();
+            }
+        }
+
+        // Load and Render Cytoscape.js Knowledge Graph
+        async function reloadGraph() {
+            const checkedCheckboxes = document.querySelectorAll('.paper-checkbox:checked');
+            const paperIds = Array.from(checkedCheckboxes).map(cb => cb.value);
+            const payload = {};
+            if (paperIds.length > 0) {
+                payload.paper_ids = paperIds;
+            }
+            
+            const cyContainer = document.getElementById('cy');
+            cyContainer.innerHTML = '<div style="display: flex; justify-content: center; align-items: center; height: 100%; color: var(--text-dim);">Loading Graph Elements...</div>';
+            
+            try {
+                const response = await fetch('/api/v1/intel/graph', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await response.json();
+                
+                if (!data.nodes || data.nodes.length === 0) {
+                    cyContainer.innerHTML = '<div style="display: flex; justify-content: center; align-items: center; height: 100%; color: var(--text-dim); text-align: center; padding: 1rem;">No entities or relations indexed in the Knowledge Graph yet. Ingest documents to extract them!</div>';
+                    return;
+                }
+                
+                // Clear container
+                cyContainer.innerHTML = '';
+                
+                const colors = {
+                    'Author': '#c084fc', // Purple
+                    'Method': '#818cf8', // Indigo
+                    'Dataset': '#34d399', // Emerald
+                    'Algorithm': '#2dd4bf', // Teal
+                    'Equation': '#22d3ee', // Cyan
+                    'Result': '#fb923c', // Orange
+                    'Paper': '#60a5fa' // Blue
+                };
+                
+                const cy = cytoscape({
+                    container: cyContainer,
+                    elements: {
+                        nodes: data.nodes,
+                        edges: data.edges
+                    },
+                    style: [
+                        {
+                            selector: 'node',
+                            style: {
+                                'label': 'data(label)',
+                                'background-color': function(ele) {
+                                    return colors[ele.data('type')] || '#94a3b8';
+                                },
+                                'color': '#f8fafc',
+                                'font-size': '9px',
+                                'font-weight': 'bold',
+                                'text-valign': 'center',
+                                'text-halign': 'center',
+                                'text-wrap': 'wrap',
+                                'text-max-width': '50px',
+                                'width': '34px',
+                                'height': '34px',
+                                'overlay-opacity': 0,
+                                'transition-property': 'background-color, width, height',
+                                'transition-duration': '0.2s'
+                            }
+                        },
+                        {
+                            selector: 'node:selected',
+                            style: {
+                                'border-width': '2px',
+                                'border-color': '#f8fafc',
+                                'width': '40px',
+                                'height': '40px'
+                            }
+                        },
+                        {
+                            selector: 'edge',
+                            style: {
+                                'label': 'data(label)',
+                                'color': '#94a3b8',
+                                'font-size': '7px',
+                                'width': 1.2,
+                                'line-color': '#475569',
+                                'target-arrow-color': '#475569',
+                                'target-arrow-shape': 'triangle',
+                                'curve-style': 'bezier',
+                                'text-rotation': 'autorotate',
+                                'text-background-opacity': 0.8,
+                                'text-background-color': '#0f172a',
+                                'text-background-padding': '2px',
+                                'text-background-shape': 'roundrectangle'
+                            }
+                        }
+                    ],
+                    layout: {
+                        name: 'cose',
+                        animate: true,
+                        randomize: true,
+                        fit: true,
+                        padding: 30,
+                        nodeOverlap: 20,
+                        componentSpacing: 45,
+                        idealEdgeLength: function(edge){ return 90; },
+                        edgeElasticity: function(edge){ return 100; },
+                        nestingFactor: 1.2
+                    }
+                });
+                
+                // Tap node to show info box
+                cy.on('tap', 'node', function(evt){
+                    const node = evt.target;
+                    const infoPanel = document.getElementById('cyInfo');
+                    const infoTitle = document.getElementById('cyInfoTitle');
+                    const infoText = document.getElementById('cyInfoText');
+                    
+                    infoTitle.innerText = `${node.data('label')}`;
+                    infoText.innerHTML = `<strong>Type:</strong> ${node.data('type')}<br/><strong>ID:</strong> <span style="font-family: monospace; font-size: 0.75rem;">${node.data('id')}</span>`;
+                    infoPanel.style.display = 'block';
+                });
+                
+                // Hide info box when tapping canvas background
+                cy.on('tap', function(evt){
+                    if(evt.target === cy){
+                        document.getElementById('cyInfo').style.display = 'none';
+                    }
+                });
+                
+            } catch (error) {
+                console.error("Failed to load Knowledge Graph:", error);
+                cyContainer.innerHTML = '<div style="display: flex; justify-content: center; align-items: center; height: 100%; color: #ef4444;">Failed to load graph database. Check server connection.</div>';
+            }
+        }
 
         document.addEventListener('DOMContentLoaded', () => {
             loadLibrary();

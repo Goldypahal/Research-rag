@@ -24,12 +24,31 @@ class BM25Index:
         tokenized_query = query.split()
         doc_scores = self.bm25.get_scores(tokenized_query)
         
-        # Apply filters if provided (basic implementation for paper_id)
         candidate_indices = range(len(self.chunks))
-        if filters and "paper_id" in filters:
-            allowed_ids = filters["paper_id"]
-            if isinstance(allowed_ids, str): allowed_ids = [allowed_ids]
-            candidate_indices = [i for i in candidate_indices if self.chunks[i].paper_id in allowed_ids]
+        if filters:
+            for key, val in filters.items():
+                if key == "paper_id" and val is not None:
+                    allowed_ids = val
+                    if isinstance(allowed_ids, str): allowed_ids = [allowed_ids]
+                    candidate_indices = [i for i in candidate_indices if self.chunks[i].paper_id in allowed_ids]
+                elif key == "year" and val is not None:
+                    if isinstance(val, dict):
+                        for op, op_val in val.items():
+                            if op == "$gte" and op_val is not None:
+                                candidate_indices = [i for i in candidate_indices if self.chunks[i].year is not None and self.chunks[i].year >= op_val]
+                            elif op == "$lte" and op_val is not None:
+                                candidate_indices = [i for i in candidate_indices if self.chunks[i].year is not None and self.chunks[i].year <= op_val]
+                            elif op == "$gt" and op_val is not None:
+                                candidate_indices = [i for i in candidate_indices if self.chunks[i].year is not None and self.chunks[i].year > op_val]
+                            elif op == "$lt" and op_val is not None:
+                                candidate_indices = [i for i in candidate_indices if self.chunks[i].year is not None and self.chunks[i].year < op_val]
+                    else:
+                        candidate_indices = [i for i in candidate_indices if self.chunks[i].year == val]
+                elif key == "chunk_level" and val is not None:
+                    if isinstance(val, list):
+                        candidate_indices = [i for i in candidate_indices if self.chunks[i].chunk_level in val]
+                    else:
+                        candidate_indices = [i for i in candidate_indices if self.chunks[i].chunk_level == val]
 
         if not candidate_indices:
             return []

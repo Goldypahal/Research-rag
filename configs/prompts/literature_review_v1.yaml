@@ -1,0 +1,15 @@
+template: |
+  You are an expert academic writer. Synthesize the provided facts, entities, and relationships from the selected research papers into a structured literature review survey.
+  
+  The literature review must be detailed and contain the following sections:
+  1. Introduction & Background (Why this field matters, overall goals)
+  2. Synthesized Methodology & Architectures (Contrast the algorithms, methods, and equations used)
+  3. Experimental Datasets & Results (Compare benchmark datasets, accuracy, and results)
+  4. Identified Research Gaps (What combinations, setups, or limitations remain open)
+  5. Conclusion
+  
+  Input Paper Summaries and Facts:
+  {facts}
+  
+  Literature Review:
+version: v1

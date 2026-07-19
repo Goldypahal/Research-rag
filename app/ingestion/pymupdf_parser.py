@@ -44,6 +44,28 @@ class PyMuPDFPaperParser(BasePaperParser):
         all_text = []
 
         for page_idx, page in enumerate(doc):
+            # 1. Extract and format tables
+            table_markdowns = []
+            try:
+                if hasattr(page, "find_tables"):
+                    tables = page.find_tables()
+                    for table in tables:
+                        table_data = table.extract()
+                        if table_data:
+                            md_lines = []
+                            headers = [str(x or "").replace("\n", " ").strip() for x in table_data[0]]
+                            md_lines.append("| " + " | ".join(headers) + " |")
+                            md_lines.append("| " + " | ".join(["---"] * len(headers)) + " |")
+                            for row in table_data[1:]:
+                                cols = [str(x or "").replace("\n", " ").strip() for x in row]
+                                if len(cols) < len(headers):
+                                    cols.extend([""] * (len(headers) - len(cols)))
+                                md_lines.append("| " + " | ".join(cols[:len(headers)]) + " |")
+                            table_markdowns.append("\n".join(md_lines))
+            except Exception as e:
+                logger.warning(f"Failed to find tables on page {page_idx + 1}: {e}")
+
+            # 2. Extract standard text lines
             text = page.get_text("text")
             lines = [ln.strip() for ln in text.splitlines() if ln.strip()]
             all_text.extend(lines)
@@ -51,6 +73,24 @@ class PyMuPDFPaperParser(BasePaperParser):
             if page_idx == 0 and not title and lines:
                 title = lines[0]
 
+            # 3. Add Table elements
+            for md_tbl in table_markdowns:
+                elements.append(
+                    ParsedElement(
+                        element_type="Table",
+                        text=md_tbl,
+                        page=page_idx + 1,
+                        section=current_section,
+                        subsection=current_subsection,
+                        subsubsection=current_subsubsection,
+                        section_path=current_path.copy(),
+                        heading_number=current_heading_number,
+                        heading_level=current_heading_level,
+                        metadata={"chunk_type": "table"},
+                    )
+                )
+
+            # 4. Process lines
             for line in lines:
                 m = HEADING_RE.match(line)
                 if m:
@@ -84,15 +124,23 @@ class PyMuPDFPaperParser(BasePaperParser):
                     )
                 else:
                     chunk_type = "text"
+                    element_type = "NarrativeText"
                     lower = line.lower()
                     if lower.startswith("figure"):
                         chunk_type = "figure_caption"
                     elif lower.startswith("table"):
                         chunk_type = "table_summary"
+                    
+                    # LaTeX equation check
+                    if (re.search(r"\(\d+\)\s*$", line) or 
+                        re.search(r"\\(?:alpha|beta|gamma|delta|epsilon|theta|lambda|mu|pi|sigma|phi|omega|sum|int|partial|nabla|times|div|approx|neq|leq|geq|infty|rightarrow)", line) or 
+                        "$" in line):
+                        chunk_type = "equation"
+                        element_type = "Equation"
 
                     elements.append(
                         ParsedElement(
-                            element_type="NarrativeText",
+                            element_type=element_type,
                             text=line,
                             page=page_idx + 1,
                             section=current_section,
