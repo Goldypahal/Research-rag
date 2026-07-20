@@ -23,3 +23,4 @@ google-generativeai
 langchain-google-genai
 pytest>=7.0.0
 pytest-mock
+python-multipart
